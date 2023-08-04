@@ -2,6 +2,8 @@
 
 namespace App\Class\Message\Interface;
 
+use App\Class\PromptHistory\PromptHistoryDTO;
+
 interface MessageInterface
 {
     public function getContent(): ?string;
@@ -12,4 +14,10 @@ interface MessageInterface
     public function setSenderId(int|null $senderId): self;
     public function getId(): ?int;
     public function setId(int|null $id): self;
+    public function getConversionId(): ?int;
+    public function setConversionId(int|null $conversationId): self;
+    public function getPromptHistory(): ?PromptHistoryDTO;
+    public function setPromptHistory(?PromptHistoryDTO $promptHistory): self;
+    public function getUserId(): ?int;
+    public function setUserId(?int $userId): self;
 }

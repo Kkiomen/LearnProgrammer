@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use App\Class\Conversation\Enum\ConversationStatus;
 
 return new class extends Migration
 {
@@ -16,9 +17,11 @@ return new class extends Migration
         Schema::create('conversations', function (Blueprint $table) {
             $table->id();
             $table->unsignedInteger('user_id');
+            $table->unsignedInteger('assistant_id')->nullable();
+            $table->unsignedInteger('consultant_id')->nullable();
             $table->text('title')->nullable();
             $table->boolean('active')->default(false);
-            $table->string('avatar');
+            $table->enum('status', ConversationStatus::toArray())->default(ConversationStatus::ASSISTANT);
             $table->timestamps();
         });
     }

@@ -3,13 +3,24 @@
 namespace App\Class\Message;
 
 use App\Class\Message\Interface\MessageInterface;
+use App\Class\PromptHistory\PromptHistoryDTO;
 
-final class MessageDTO implements MessageInterface
+class MessageDTO implements MessageInterface
 {
     /**
      * @var int|null The ID of the message.
      */
     private ?int $id;
+
+    /**
+     * @var int|null The ID of the conversion.
+     */
+    private ?int $conversationId;
+
+    /**
+     * @var int|null The ID of the user.
+     */
+    private ?int $userId;
 
     /**
      * @var string|null The content of the message.
@@ -25,6 +36,11 @@ final class MessageDTO implements MessageInterface
      * @var int|null The ID of the sender.
      */
     private ?int $senderId;
+
+    /**
+     * @var PromptHistoryDTO|null The class with information about Using Prompt
+     */
+    private ?PromptHistoryDTO $promptHistory;
 
     /**
      * Get the ID of the message.
@@ -45,6 +61,50 @@ final class MessageDTO implements MessageInterface
     public function setId(?int $id): self
     {
         $this->id = $id;
+        return $this;
+    }
+
+    /**
+     * Get the id of the conversation.
+     *
+     * @return int|null The id of the conversation.
+     */
+    public function getConversionId(): ?int
+    {
+        return $this->conversationId;
+    }
+
+    /**
+     * Set the id of the conversation.
+     *
+     * @param int|null $conversationId The id of the conversation
+     * @return self Returns an instance of the MessageDTO.
+     */
+    public function setConversionId(?int $conversationId): self
+    {
+        $this->conversationId = $conversationId;
+        return $this;
+    }
+
+    /**
+     * Get the id of the user.
+     *
+     * @return int|null The id of the user.
+     */
+    public function getUserId(): ?int
+    {
+        return $this->userId;
+    }
+
+    /**
+     * Set the id of the user.
+     *
+     * @param int|null $userId The id of the user
+     * @return self Returns an instance of the MessageDTO.
+     */
+    public function setUserId(?int $userId): self
+    {
+        $this->userId = $userId;
         return $this;
     }
 
@@ -111,6 +171,26 @@ final class MessageDTO implements MessageInterface
     public function setSenderId(?int $senderId): self
     {
         $this->senderId = $senderId;
+        return $this;
+    }
+
+    /**
+     * Get the information about used Prompt
+     * @return PromptHistoryDTO|null Information about used Prompt
+     */
+    public function getPromptHistory(): ?PromptHistoryDTO
+    {
+        return $this->promptHistory;
+    }
+
+    /**
+     * Set Information about used Prompt
+     * @param PromptHistoryDTO|null $promptHistory
+     * @return self
+     */
+    public function setPromptHistory(?PromptHistoryDTO $promptHistory): self
+    {
+        $this->promptHistory = $promptHistory;
         return $this;
     }
 }

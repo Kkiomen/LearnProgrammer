@@ -8,6 +8,8 @@ use App\Class\Message\LinkMessageDTO;
 use App\Class\Message\MessageDTO;
 use App\Class\Message\Utils\PhotoMessage;
 use App\Class\Message\Utils\UrlMessage;
+use App\Class\PromptHistory\PromptHistoryDTO;
+use Illuminate\Support\Facades\Auth;
 
 final class MessageDTOFactory
 {
@@ -23,22 +25,35 @@ final class MessageDTOFactory
      *
      * @return MessageInterface A new instance of MessageInterface or its subclass (ImageMessage or LinkMessage).
      */
-    public static function createMessage(
+    public function createMessageDTO(
         int $id = null,
+        int $conversationId = null,
         string $content = null,
         int $senderId = null,
         string $senderClass = null,
         array $urls = [],
-        array $images = []
+        array $images = [],
+        string $prompt = null,
+        string $system = null,
+        int $userId = null
     ): MessageInterface {
         $message = new MessageDTO();
         $message->setId($id ?? null);
         $message->setContent($content ?? null);
         $message->setSenderClass($senderClass ?? null);
         $message->setSenderId($senderId ?? null);
+        $message->setUserId($userId ?? Auth::user()->id);
+        $message->setConversionId($conversationId ?? null);
+
+        if($prompt !== null || $system !== null){
+            $promptHistory = new PromptHistoryDTO($prompt, $system);
+            $message->setPromptHistory($promptHistory);
+        }
+
+        $message->setSenderId($senderId ?? null);
 
         if (!empty($images)) {
-            $message = new ImageMessageDTO($message);
+            $message = new ImageMessageDTO();
             foreach ($images as $image) {
                 $photoMessage = new PhotoMessage($image['path'], $image['name']);
                 $message->addImage($photoMessage);
@@ -46,7 +61,7 @@ final class MessageDTOFactory
         }
 
         if (!empty($urls)) {
-            $message = new LinkMessageDTO($message);
+            $message = new LinkMessageDTO();
             foreach ($urls as $url) {
                 $urlMessage = new UrlMessage($url['url'], $url['name']);
                 $message->addUrl($urlMessage);

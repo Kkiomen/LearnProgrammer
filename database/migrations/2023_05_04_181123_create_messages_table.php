@@ -17,13 +17,11 @@ return new class extends Migration
             $table->id();
             $table->unsignedInteger('user_id');
             $table->unsignedInteger('conversation_id');
-            $table->text('message')->nullable();
-            $table->text('result')->nullable();
-            $table->text('type')->nullable();
+            $table->text('content')->nullable();
+            $table->string('sender_class')->nullable();
+            $table->id('sender_id')->nullable();
             $table->text('prompt')->nullable();
             $table->text('system')->nullable();
-            $table->boolean('sync')->default(false);
-            $table->string('avatar');
             $table->timestamps();
         });
     }

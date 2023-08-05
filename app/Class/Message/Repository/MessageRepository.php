@@ -23,7 +23,7 @@ final class MessageRepository
      * @return void
      */
     public function save(MessageInterface $messageDTO){
-        $message = $this->messageMapper->DTOToEntity($messageDTO);
+        $message = $this->messageMapper->mapToModel($messageDTO);
         $message->save();
     }
 
@@ -37,7 +37,7 @@ final class MessageRepository
         return Message::all();
     }
 
-    public function findAllForUser(array|null $criteria, bool $toDto = false): Collection|null
+    public function findAllForUser(array|null $criteria, bool $toDto = true): Collection|null
     {
         if($criteria === null){
             return null;
@@ -53,7 +53,7 @@ final class MessageRepository
      * @param bool $toDto Whether to convert the result to DTO (not used in current method, but included for consistency)
      * @return Collection|null Collection of found messages or null if criteria is not provided
      */
-    public function findBy(array|null $criteria, bool $toDto = false): Collection|null
+    public function getMessagesBy(array|null $criteria, bool $toDto = true): Collection|null
     {
         if($criteria === null){
             return null;
@@ -69,7 +69,7 @@ final class MessageRepository
      * @param bool $toDto Whether to convert the result to DTO
      * @return Message|MessageInterface|null The found message or null if not found
      */
-    public function findOneBy(array|null $criteria, bool $toDto = false): Message|MessageInterface|null
+    public function getMessageBy(array|null $criteria, bool $toDto = true): Message|MessageInterface|null
     {
         if($criteria === null){
             return null;
@@ -77,7 +77,7 @@ final class MessageRepository
 
         $entity = Message::where($criteria)->first();
         if($toDto){
-            return $this->messageMapper->entityToDTO($entity);
+            return $this->messageMapper->mapToDTO($entity);
         }
 
         return $entity;
@@ -90,15 +90,15 @@ final class MessageRepository
      * @param bool $toDto Whether to convert the result to DTO
      * @return Message|MessageInterface|null The found message or null if not found
      */
-    public function findOneById(int|null $id, bool $toDto = false): Message|MessageInterface|null
+    public function getMessageById(int|null $id, bool $toDto = true): Message|MessageInterface|null
     {
         if($id === null){
             return null;
         }
 
-        $entity = Message::where('id', $id)->first();
+        $entity = Message::find($id);
         if($toDto){
-            return $this->messageMapper->entityToDTO($entity);
+            return $this->messageMapper->mapToDTO($entity);
         }
 
         return $entity;

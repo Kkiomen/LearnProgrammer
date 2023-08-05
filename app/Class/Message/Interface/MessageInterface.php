@@ -3,8 +3,9 @@
 namespace App\Class\Message\Interface;
 
 use App\Class\PromptHistory\PromptHistoryDTO;
+use App\Core\Interfaces\DTOInterface;
 
-interface MessageInterface
+interface MessageInterface extends DTOInterface
 {
     public function getContent(): ?string;
     public function setContent(string|null $content): self;
@@ -12,8 +13,6 @@ interface MessageInterface
     public function setSenderClass(string|null $senderClass): self;
     public function getSenderId(): ?int;
     public function setSenderId(int|null $senderId): self;
-    public function getId(): ?int;
-    public function setId(int|null $id): self;
     public function getConversionId(): ?int;
     public function setConversionId(int|null $conversationId): self;
     public function getPromptHistory(): ?PromptHistoryDTO;

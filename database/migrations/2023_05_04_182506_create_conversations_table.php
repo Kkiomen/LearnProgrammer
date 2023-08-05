@@ -19,6 +19,7 @@ return new class extends Migration
             $table->unsignedInteger('user_id');
             $table->unsignedInteger('assistant_id')->nullable();
             $table->unsignedInteger('consultant_id')->nullable();
+            $table->string('session_hash')->nullable();
             $table->text('title')->nullable();
             $table->boolean('active')->default(false);
             $table->enum('status', ConversationStatus::toArray())->default(ConversationStatus::ASSISTANT);

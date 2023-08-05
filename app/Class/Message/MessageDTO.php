@@ -4,13 +4,10 @@ namespace App\Class\Message;
 
 use App\Class\Message\Interface\MessageInterface;
 use App\Class\PromptHistory\PromptHistoryDTO;
+use App\Core\Abstract\Dto;
 
-class MessageDTO implements MessageInterface
+class MessageDTO extends Dto implements MessageInterface
 {
-    /**
-     * @var int|null The ID of the message.
-     */
-    private ?int $id;
 
     /**
      * @var int|null The ID of the conversion.
@@ -41,28 +38,6 @@ class MessageDTO implements MessageInterface
      * @var PromptHistoryDTO|null The class with information about Using Prompt
      */
     private ?PromptHistoryDTO $promptHistory;
-
-    /**
-     * Get the ID of the message.
-     *
-     * @return int|null The ID of the message.
-     */
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
-
-    /**
-     * Set the ID of the message.
-     *
-     * @param int|null $id The ID to set for the message.
-     * @return self Returns an instance of the MessageDTO.
-     */
-    public function setId(?int $id): self
-    {
-        $this->id = $id;
-        return $this;
-    }
 
     /**
      * Get the id of the conversation.

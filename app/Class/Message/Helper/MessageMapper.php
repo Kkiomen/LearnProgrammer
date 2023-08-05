@@ -6,10 +6,14 @@ use App\Class\Message\Factory\MessageDTOFactory;
 use App\Class\Message\Interface\MessageInterface;
 use App\Class\Message\MessageDTO;
 use App\Class\PromptHistory\PromptHistoryDTO;
+use App\Core\Abstract\Mapper;
+use App\Core\Interfaces\DTOInterface;
 use App\Models\Message;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 
-final class MessageMapper
+final class MessageMapper extends Mapper
 {
 
     public function __construct(
@@ -18,40 +22,49 @@ final class MessageMapper
     {
     }
 
-    public function entityToDTO(Message $message): MessageInterface
+    public function mapToDTO(Message|Model $model): DTOInterface
     {
         $messageDTO = new MessageDTO();
-        $messageDTO->setId($message->id)
-            ->setContent($message->content)
-            ->setSenderClass($message->senderClass)
-            ->setSenderId($message->sender_id)
-            ->setPromptHistory(new PromptHistoryDTO($message->prompt, $message->system))
-            ->setConversionId($message->conversation_id)
-            ->setUserId($message->user_id);
+        $messageDTO->setId($model->id)
+            ->setContent($model->content)
+            ->setSenderClass($model->senderClass)
+            ->setSenderId($model->sender_id)
+            ->setPromptHistory(new PromptHistoryDTO($model->prompt, $model->system))
+            ->setConversionId($model->conversation_id)
+            ->setUserId($model->user_id);
 
         return $this->messageDTOFactory->createMessageDTO(
-            id: $message->id,
-            conversationId: $message->conversation_id,
-            content: $message->content,
-            senderId: $message->sender_id,
-            senderClass: $message->sender_class,
-            prompt: $message->prompt,
-            system: $message->system,
-            userId: $message->user_id
+            id: $model->id,
+            conversationId: $model->conversation_id,
+            content: $model->content,
+            senderId: $model->sender_id,
+            senderClass: $model->sender_class,
+            prompt: $model->prompt,
+            system: $model->system,
+            userId: $model->user_id
         );
     }
 
-    public function DTOToEntity(MessageInterface $messageDTO): Message
+    public function mapCollectionToDTO(array $conversations): Collection
+    {
+        $collection = new Collection();
+        foreach ($conversations as $conversation) {
+            $collection->add($this->mapToDTO($conversation));
+        }
+        return $collection;
+    }
+
+    public function mapToModel(MessageInterface|DTOInterface $dtoClass): Model
     {
         $message = new Message();
-        $message->id = $messageDTO->getId() ?? null;
+        $message->id = $dtoClass->getId() ?? null;
         $message->user_id = Auth::user()->id ?? null;
-        $message->conversation_id = $messageDTO->getConversionId() ?? null;
-        $message->content = $messageDTO->getContent() ?? null;
-        $message->senderClass = $messageDTO->getSenderClass() ?? null;
-        $message->sender_id = $messageDTO->getSenderId() ?? null;
-        $message->prompt = $messageDTO->getPromptHistory()->getPrompt() ?? null;
-        $message->system = $messageDTO->getPromptHistory()->getSystem() ?? null;
+        $message->conversation_id = $dtoClass->getConversionId() ?? null;
+        $message->content = $dtoClass->getContent() ?? null;
+        $message->senderClass = $dtoClass->getSenderClass() ?? null;
+        $message->sender_id = $dtoClass->getSenderId() ?? null;
+        $message->prompt = $dtoClass->getPromptHistory()->getPrompt() ?? null;
+        $message->system = $dtoClass->getPromptHistory()->getSystem() ?? null;
 
         return $message;
     }

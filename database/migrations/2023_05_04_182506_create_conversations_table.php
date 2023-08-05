@@ -22,7 +22,7 @@ return new class extends Migration
             $table->string('session_hash')->nullable();
             $table->text('title')->nullable();
             $table->boolean('active')->default(false);
-            $table->enum('status', ConversationStatus::toArray())->default(ConversationStatus::ASSISTANT);
+            $table->enum('status', ConversationStatus::toArray())->default(ConversationStatus::ASSISTANT->value);
             $table->timestamps();
         });
     }

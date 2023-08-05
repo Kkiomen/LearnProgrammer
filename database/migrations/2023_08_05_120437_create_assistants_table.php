@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use App\Class\Assistant\Enum\AssistantType;
 
 return new class extends Migration
 {
@@ -13,15 +14,15 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('messages', function (Blueprint $table) {
+        Schema::create('assistants', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('user_id');
-            $table->unsignedBigInteger('conversation_id');
-            $table->text('content')->nullable();
-            $table->string('sender_class')->nullable();
-            $table->unsignedBigInteger('sender_id')->nullable();
+            $table->string('img_url')->nullable();
+            $table->string('name');
+            $table->text('short_name')->nullable();
             $table->text('prompt')->nullable();
-            $table->text('system')->nullable();
+            $table->integer('sort')->default(1);
+            $table->enum('type', AssistantType::toArray())->default(AssistantType::BASIC->value);
+            $table->boolean('public')->default(true);
             $table->timestamps();
         });
     }
@@ -33,6 +34,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('messages');
+        Schema::dropIfExists('assistants');
     }
 };

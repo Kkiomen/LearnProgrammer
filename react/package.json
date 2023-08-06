@@ -21,6 +21,7 @@
     "flowbite-react": "^0.4.3",
     "perfect-scrollbar": "^1.5.5",
     "react": "^18.2.0",
+    "react-cookie": "^4.1.1",
     "react-dom": "^18.2.0",
     "react-fetch-streams": "^1.1.2",
     "react-icons": "^4.8.0",

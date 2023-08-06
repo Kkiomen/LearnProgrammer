@@ -8,10 +8,10 @@ use Illuminate\Support\Collection;
 
 abstract class Mapper
 {
-    public function mapCollectionToDTO(array $conversations): Collection
+    public function mapCollectionToDTO(array|\Illuminate\Database\Eloquent\Collection $models): Collection
     {
         $collection = new Collection();
-        foreach ($conversations as $conversation) {
+        foreach ($models as $conversation) {
             $collection->add($this->mapToDTO($conversation));
         }
         return $collection;

@@ -3,7 +3,7 @@
 namespace App\Class\Message;
 
 use App\Class\Message\Interface\MessageInterface;
-use App\Class\PromptHistory\PromptHistoryDTO;
+use App\Class\PromptHistory\Prompt;
 use App\Core\Abstract\Dto;
 
 class MessageDTO extends Dto implements MessageInterface
@@ -35,9 +35,23 @@ class MessageDTO extends Dto implements MessageInterface
     private ?int $senderId;
 
     /**
-     * @var PromptHistoryDTO|null The class with information about Using Prompt
+     * @var Prompt|null The class with information about Using Prompt
      */
-    private ?PromptHistoryDTO $promptHistory;
+    private ?Prompt $promptHistory;
+
+    /**
+     * @var string|null The result of the message (result OpenAi).
+     */
+    private ?string $result;
+
+    /**
+     * @param  Prompt|null  $promptHistory
+     */
+    public function __construct()
+    {
+        $this->promptHistory = new Prompt(null, null);
+    }
+
 
     /**
      * Get the id of the conversation.
@@ -143,7 +157,7 @@ class MessageDTO extends Dto implements MessageInterface
      * @param int|null $senderId The ID to set for the sender.
      * @return self Returns an instance of the MessageDTO.
      */
-    public function setSenderId(?int $senderId): self
+    public function setSenderId(int|null $senderId): self
     {
         $this->senderId = $senderId;
         return $this;
@@ -151,21 +165,43 @@ class MessageDTO extends Dto implements MessageInterface
 
     /**
      * Get the information about used Prompt
-     * @return PromptHistoryDTO|null Information about used Prompt
+     * @return Prompt|null Information about used Prompt
      */
-    public function getPromptHistory(): ?PromptHistoryDTO
+    public function getPromptHistory(): ?Prompt
     {
         return $this->promptHistory;
     }
 
     /**
      * Set Information about used Prompt
-     * @param PromptHistoryDTO|null $promptHistory
+     * @param Prompt|null $promptHistory
      * @return self
      */
-    public function setPromptHistory(?PromptHistoryDTO $promptHistory): self
+    public function setPromptHistory(Prompt|null $promptHistory): self
     {
         $this->promptHistory = $promptHistory;
         return $this;
     }
+
+    /**
+     * Get The result of the message (result OpenAi).
+     * @return string|null
+     */
+    public function getResult(): ?string
+    {
+        return $this->result;
+    }
+
+    /**
+     *  Set result of the message (result OpenAi).
+     * @param  string|null  $result
+     * @return $this
+     */
+    public function setResult(string|null $result): self
+    {
+        $this->result = $result;
+        return $this;
+    }
+
+
 }

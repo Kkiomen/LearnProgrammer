@@ -15,13 +15,14 @@ return new class extends Migration
     {
         Schema::create('messages', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('user_id');
+            $table->unsignedBigInteger('user_id')->nullable();
             $table->unsignedBigInteger('conversation_id');
             $table->text('content')->nullable();
             $table->string('sender_class')->nullable();
             $table->unsignedBigInteger('sender_id')->nullable();
             $table->text('prompt')->nullable();
             $table->text('system')->nullable();
+            $table->text('result')->nullable();
             $table->timestamps();
         });
     }

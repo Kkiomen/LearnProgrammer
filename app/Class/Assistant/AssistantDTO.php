@@ -4,7 +4,7 @@ namespace App\Class\Assistant;
 
 use App\Class\Assistant\Enum\AssistantType;
 use App\Class\Assistant\Interface\AssistantInterface;
-use App\Class\PromptHistory\PromptHistoryDTO;
+use App\Class\PromptHistory\Prompt;
 use App\Core\Abstract\Dto;
 
 class AssistantDTO extends Dto implements AssistantInterface
@@ -12,7 +12,7 @@ class AssistantDTO extends Dto implements AssistantInterface
     private ?string $imgUrl;
     private ?string $name;
     private ?string $shortName;
-    private ?PromptHistoryDTO $promptHistory;
+    private ?Prompt $promptHistory;
     private ?int $sort;
     private ?AssistantType $type;
     private ?bool $public;
@@ -50,12 +50,12 @@ class AssistantDTO extends Dto implements AssistantInterface
         return $this;
     }
 
-    public function getPromptHistory(): ?PromptHistoryDTO
+    public function getPromptHistory(): ?Prompt
     {
         return $this->promptHistory;
     }
 
-    public function setPromptHistory(?PromptHistoryDTO $promptHistory): self
+    public function setPromptHistory(?Prompt $promptHistory): self
     {
         $this->promptHistory = $promptHistory;
         return $this;

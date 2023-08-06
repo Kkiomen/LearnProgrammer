@@ -9,12 +9,15 @@ import 'react-toastify/dist/ReactToastify.css';
 import {RouterProvider} from "react-router-dom";
 import router from "./router.jsx";
 import {ContextProvider} from './context/ContextProvider.jsx'
+import {CookiesProvider} from "react-cookie";
 register();
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <ContextProvider>
-      <RouterProvider router={router} />
-    </ContextProvider>
+    <CookiesProvider>
+      <ContextProvider>
+        <RouterProvider router={router} />
+      </ContextProvider>
+    </CookiesProvider>
   </React.StrictMode>
 );

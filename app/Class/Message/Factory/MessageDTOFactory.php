@@ -8,7 +8,7 @@ use App\Class\Message\LinkMessageDTO;
 use App\Class\Message\MessageDTO;
 use App\Class\Message\Utils\PhotoMessage;
 use App\Class\Message\Utils\UrlMessage;
-use App\Class\PromptHistory\PromptHistoryDTO;
+use App\Class\PromptHistory\Prompt;
 use Illuminate\Support\Facades\Auth;
 
 final class MessageDTOFactory
@@ -35,18 +35,20 @@ final class MessageDTOFactory
         array $images = [],
         string $prompt = null,
         string $system = null,
-        int $userId = null
+        int $userId = null,
+        string $result = null
     ): MessageInterface {
         $message = new MessageDTO();
         $message->setId($id ?? null);
         $message->setContent($content ?? null);
         $message->setSenderClass($senderClass ?? null);
         $message->setSenderId($senderId ?? null);
-        $message->setUserId($userId ?? Auth::user()->id);
+        $message->setUserId($userId ?? Auth::user()->id ?? null);
         $message->setConversionId($conversationId ?? null);
+        $message->setResult($result ?? null);
 
         if($prompt !== null || $system !== null){
-            $promptHistory = new PromptHistoryDTO($prompt, $system);
+            $promptHistory = new Prompt($prompt, $system);
             $message->setPromptHistory($promptHistory);
         }
 

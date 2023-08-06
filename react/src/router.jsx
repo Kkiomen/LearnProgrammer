@@ -1,24 +1,15 @@
 import {createBrowserRouter, Navigate} from "react-router-dom";
-import Dashboard from "./Dashboard.jsx";
-import DefaultLayout from "./components/DefaultLayout";
 import GuestLayout from "./components/GuestLayout";
 import Login from "./views/Login";
 import NotFound from "./views/NotFound";
 import Signup from "./views/Signup";
-import Users from "./views/Users";
-import UserForm from "./views/UserForm";
-import Home from "./views/Home.jsx";
-import AppLayout from "./components/AppLayout.jsx";
-import Board from "./views/Board.jsx";
-import Trader from "./views/Trader.jsx";
-import ProductDescription from "./views/ProductDescription.jsx";
-import Aidevs from "./views/Aidevs.jsx";
 import Settings from "./views/Settings.jsx";
 import AddSnippet from "./views/AddSnippet.jsx";
 import Group from "./views/Group.jsx";
 import MainLayout from "./components/MainLayout.jsx";
 import Index from "./views/Index.jsx";
 import MainAppLayout from "./components/MainAppLayout.jsx";
+import AssistantChat from "./components/AssistantChat.jsx";
 
 const router = createBrowserRouter([
   {
@@ -118,6 +109,10 @@ const router = createBrowserRouter([
     path: '/',
     element: <GuestLayout/>,
     children: [
+      {
+        path: '/asystent/:assistantId',
+        element: <AssistantChat/>
+      },
       {
         path: '/login',
         element: <Login/>

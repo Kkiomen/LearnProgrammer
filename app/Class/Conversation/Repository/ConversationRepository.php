@@ -4,14 +4,18 @@ namespace App\Class\Conversation\Repository;
 
 use App\Class\Conversation\Helper\ConversationMapper;
 use App\Class\Conversation\Interface\ConversationInterface;
+use App\Class\Message\Repository\MessageRepository;
+use App\Core\Interfaces\DTOInterface;
 use App\Models\Conversation;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Str;
 
 class ConversationRepository
 {
 
     public function __construct(
-        private readonly ConversationMapper $conversationMapper
+        private readonly ConversationMapper $conversationMapper,
+        private readonly MessageRepository $messageRepository
     )
     {
     }
@@ -30,14 +34,18 @@ class ConversationRepository
         return $conversation;
     }
 
-    public function getConversationBySessionHash(string|null $sessionHash, bool $toDto = true): Conversation|ConversationInterface|null
+    public function getConversationBySessionHash(string|null $sessionHash, bool $toDto = true, bool $isActive = false): DTOInterface|null
     {
         if($sessionHash === null){
             return null;
         }
 
-        $conversation = Conversation::where('session_hash', $sessionHash)->first();
-        if($toDto){
+        if($isActive) {
+            $conversation = Conversation::where('session_hash', $sessionHash)->where('active', true)->first();
+        }else{
+            $conversation = Conversation::where('session_hash', $sessionHash)->first();
+        }
+        if($toDto && $conversation !== null){
             return $this->conversationMapper->mapToDTO($conversation);
         }
 
@@ -87,6 +95,47 @@ class ConversationRepository
         $conversations = Conversation::where($criteria)->get();
 
         return $conversations;
+    }
+
+    public function getNewSessionHashConversation(): string
+    {
+        do{
+            $uuid = (string) Str::uuid();
+        }while($this->getConversationBySessionHash($uuid) !== null);
+
+        return $uuid;
+    }
+
+    public function getMessagesBySessionHash(string $sessionHash): array|\Illuminate\Support\Collection
+    {
+        $conversation = $this->getConversationBySessionHash($sessionHash);
+        if($conversation === null){
+            return [];
+        }
+
+        return $this->messageRepository->getMessagesByConversationId($conversation->getId());
+    }
+
+
+    public function save(ConversationInterface &$conversation): bool
+    {
+        $conversationModel = $this->conversationMapper->mapToModel($conversation);
+        $existingConversationModel = Conversation::find($conversationModel->id);
+
+        if($existingConversationModel){
+            // Update existing conversation
+            $existingConversationModel->update($conversationModel->getAttributes());
+            return true;
+        } else {
+            // Save new message
+            if ($conversationModel->save()) {
+                // Set the id of the DTO to the id of the saved model
+                $conversationModel->setId($conversationModel->id);
+                return true;
+            }
+        }
+
+        return false;
     }
 
 

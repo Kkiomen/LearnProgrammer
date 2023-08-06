@@ -16,7 +16,7 @@ return new class extends Migration
     {
         Schema::create('conversations', function (Blueprint $table) {
             $table->id();
-            $table->unsignedInteger('user_id');
+            $table->unsignedInteger('user_id')->nullable();
             $table->unsignedInteger('assistant_id')->nullable();
             $table->unsignedInteger('consultant_id')->nullable();
             $table->string('session_hash')->nullable();

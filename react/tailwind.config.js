@@ -12,7 +12,7 @@ export default {
       },
       colors: {
 
-        'ai-m': '#131718',
+        'ai-m': '#16191a',
         'ai-m-g': '#232627',
         'ai-background': '#151515',
         'ai-conversation-page': '#232627',

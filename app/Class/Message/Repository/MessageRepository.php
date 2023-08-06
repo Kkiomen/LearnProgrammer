@@ -12,19 +12,35 @@ final class MessageRepository
 {
     public function __construct(
         private readonly MessageMapper $messageMapper,
-    )
-    {
+    ) {
     }
 
     /**
      * Save the provided message.
      *
-     * @param MessageInterface $messageDTO The message to save
-     * @return void
+     * @param  MessageInterface  $messageDTO  The message to save
+     * @return bool
      */
-    public function save(MessageInterface $messageDTO){
-        $message = $this->messageMapper->mapToModel($messageDTO);
-        $message->save();
+    public function save(MessageInterface &$messageDTO): bool
+    {
+        $messageModel = $this->messageMapper->mapToModel($messageDTO);
+        // Attempt to find existing message by id
+        $existingMessageModel = Message::find($messageModel->id);
+
+        if($existingMessageModel){
+            // Update existing message
+            $existingMessageModel->update($messageModel->getAttributes());
+            return true;
+        } else {
+            // Save new message
+            if ($messageModel->save()) {
+                // Set the id of the DTO to the id of the saved model
+                $messageDTO->setId($messageModel->id);
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -39,7 +55,7 @@ final class MessageRepository
 
     public function findAllForUser(array|null $criteria, bool $toDto = true): Collection|null
     {
-        if($criteria === null){
+        if ($criteria === null) {
             return null;
         }
 
@@ -49,13 +65,13 @@ final class MessageRepository
     /**
      * Find messages by criteria.
      *
-     * @param array|null $criteria The criteria to search by
-     * @param bool $toDto Whether to convert the result to DTO (not used in current method, but included for consistency)
+     * @param  array|null  $criteria  The criteria to search by
+     * @param  bool  $toDto  Whether to convert the result to DTO (not used in current method, but included for consistency)
      * @return Collection|null Collection of found messages or null if criteria is not provided
      */
     public function getMessagesBy(array|null $criteria, bool $toDto = true): Collection|null
     {
-        if($criteria === null){
+        if ($criteria === null) {
             return null;
         }
 
@@ -65,18 +81,18 @@ final class MessageRepository
     /**
      * Find one message by criteria.
      *
-     * @param array|null $criteria The criteria to search by
-     * @param bool $toDto Whether to convert the result to DTO
+     * @param  array|null  $criteria  The criteria to search by
+     * @param  bool  $toDto  Whether to convert the result to DTO
      * @return Message|MessageInterface|null The found message or null if not found
      */
     public function getMessageBy(array|null $criteria, bool $toDto = true): Message|MessageInterface|null
     {
-        if($criteria === null){
+        if ($criteria === null) {
             return null;
         }
 
         $entity = Message::where($criteria)->first();
-        if($toDto){
+        if ($toDto) {
             return $this->messageMapper->mapToDTO($entity);
         }
 
@@ -86,21 +102,32 @@ final class MessageRepository
     /**
      * Find one message by id.
      *
-     * @param int|null $id The id to search by
-     * @param bool $toDto Whether to convert the result to DTO
+     * @param  int|null  $id  The id to search by
+     * @param  bool  $toDto  Whether to convert the result to DTO
      * @return Message|MessageInterface|null The found message or null if not found
      */
     public function getMessageById(int|null $id, bool $toDto = true): Message|MessageInterface|null
     {
-        if($id === null){
+        if ($id === null) {
             return null;
         }
 
         $entity = Message::find($id);
-        if($toDto){
+        if ($toDto) {
             return $this->messageMapper->mapToDTO($entity);
         }
 
         return $entity;
+    }
+
+    public function getMessagesByConversationId(int $conversationId): \Illuminate\Support\Collection|array
+    {
+        $result = [];
+        $messages = Message::where('conversation_id', $conversationId)->get();
+        if($messages === null){
+            return $result;
+        }
+
+        return $this->messageMapper->mapCollectionToDTO($messages);
     }
 }

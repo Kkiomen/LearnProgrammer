@@ -5,7 +5,7 @@ namespace App\Class\Message\Helper;
 use App\Class\Message\Factory\MessageDTOFactory;
 use App\Class\Message\Interface\MessageInterface;
 use App\Class\Message\MessageDTO;
-use App\Class\PromptHistory\PromptHistoryDTO;
+use App\Class\PromptHistory\Prompt;
 use App\Core\Abstract\Mapper;
 use App\Core\Interfaces\DTOInterface;
 use App\Models\Message;
@@ -24,15 +24,6 @@ final class MessageMapper extends Mapper
 
     public function mapToDTO(Message|Model $model): DTOInterface
     {
-        $messageDTO = new MessageDTO();
-        $messageDTO->setId($model->id)
-            ->setContent($model->content)
-            ->setSenderClass($model->senderClass)
-            ->setSenderId($model->sender_id)
-            ->setPromptHistory(new PromptHistoryDTO($model->prompt, $model->system))
-            ->setConversionId($model->conversation_id)
-            ->setUserId($model->user_id);
-
         return $this->messageDTOFactory->createMessageDTO(
             id: $model->id,
             conversationId: $model->conversation_id,
@@ -41,17 +32,9 @@ final class MessageMapper extends Mapper
             senderClass: $model->sender_class,
             prompt: $model->prompt,
             system: $model->system,
-            userId: $model->user_id
+            userId: $model->user_id,
+            result: $model->result
         );
-    }
-
-    public function mapCollectionToDTO(array $conversations): Collection
-    {
-        $collection = new Collection();
-        foreach ($conversations as $conversation) {
-            $collection->add($this->mapToDTO($conversation));
-        }
-        return $collection;
     }
 
     public function mapToModel(MessageInterface|DTOInterface $dtoClass): Model
@@ -61,10 +44,11 @@ final class MessageMapper extends Mapper
         $message->user_id = Auth::user()->id ?? null;
         $message->conversation_id = $dtoClass->getConversionId() ?? null;
         $message->content = $dtoClass->getContent() ?? null;
-        $message->senderClass = $dtoClass->getSenderClass() ?? null;
+        $message->sender_class = $dtoClass->getSenderClass() ?? null;
         $message->sender_id = $dtoClass->getSenderId() ?? null;
         $message->prompt = $dtoClass->getPromptHistory()->getPrompt() ?? null;
         $message->system = $dtoClass->getPromptHistory()->getSystem() ?? null;
+        $message->result = $dtoClass->getResult() ?? null;
 
         return $message;
     }

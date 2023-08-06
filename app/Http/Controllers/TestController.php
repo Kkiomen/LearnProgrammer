@@ -6,7 +6,9 @@ use App\Api\OpenAiApi;
 use App\Api\Qdrant\Qdrant;
 use App\Api\Qdrant\Search\SearchRequest;
 use App\Api\Qdrant\Vector\VectorText;
+use App\Class\Conversation\Repository\ConversationRepository;
 use App\Class\LongTermMemory;
+use App\Class\LongTermMemoryQdrant;
 use App\Strategy\Message\MessageContext;
 use Cscheide\ArticleExtractor\ArticleExtractor;
 use Illuminate\Http\Request;
@@ -15,11 +17,11 @@ use OpenAI\Client;
 class TestController
 {
     private Client|null $client = null;
-    private LongTermMemory $longTermMemory;
+    private LongTermMemoryQdrant $longTermMemory;
     private OpenAiApi $openAiApi;
     private Qdrant $qdrant;
 
-    public function __construct(LongTermMemory $longTermMemory, Qdrant $qdrant, OpenAiApi $openAiApi)
+    public function __construct(LongTermMemoryQdrant $longTermMemory, Qdrant $qdrant, OpenAiApi $openAiApi)
     {
         $this->client = $this->getClient();
         $this->longTermMemory = $longTermMemory;
@@ -29,14 +31,28 @@ class TestController
 
     public function test(Request $request, MessageContext $messageContext)
     {
+        /**
+         * @var ConversationRepository $convRepo
+         */
+        $convRepo = app(ConversationRepository::class);
 
-        dump($this->qdrant->search(new SearchRequest(
-            vector: new VectorText(
-                openAiApi: $this->openAiApi,
-                text: 'Jadfgdfgdfg'
-            ),
-            nameCollection: 'memory'
-        )));
+        dump($convRepo->getMessagesBySessionHash('d1ce2a50-24a3-44f4-9b30-0aec2878600f'));
+
+
+
+//        foreach ($this->openAiApi->getModels()['data'] as $model){
+//            echo $model['id'] . ' -> ' . $model['object'] . '<br/>';
+//        }
+
+//        dump($this->longTermMemory->save('Jako jeden z benefitów dajemy karte multisport i ubezpieczenie na życie'));
+        dump($this->longTermMemory->getMemory('Jakie benefity dajecie?'));
+//        dump($this->qdrant->search(new SearchRequest(
+//            vector: new VectorText(
+//                openAiApi: $this->openAiApi,
+//                text: 'Jakie benefity dajecie?'
+//            ),
+//            nameCollection: 'memory'
+//        )));
 
 //        $message = 'Endpoint: /api/admin/units/{unit_id} %%% Method: delete ### Information OpenApi: {"tags":["Units"],"operationId":"delete_wise_product_apiadmin_units_deleteunitsbykey_deleteunits","parameters":[{"name":"x-request-uuid","in":"header","description":"UUID requestu","schema":{"type":"string"},"example":"49c9aa13-c5c3-474b-a874-755f9d553779"},{"name":"unit_id","in":"path","required":true,"schema":{"type":"string","pattern":"([a-zA-Z0-9-_])+"}}],"responses":{"200":{"description":"Zwrotka w przypadku znalezionych i poprawienie usuniętych obiektów","content":{"application/json":{"schema":{"$ref":"#/components/schemas/CommonDeleteResponseAdminApiDto"}}}},"400":{"description":"Niepoprawne dane wejściowe","content":{"application/json":{"schema":{"$ref":"#/components/schemas/InvalidInputDataResponseDto"}}}},"401":{"description":"Błędny token autoryzacyjny","content":{"application/json":{"schema":{"$ref":"#/components/schemas/UnauthorizedResponseDto"}}}}}}';
 //        $system = 'Return the answer in JSON and nothing else. Based on the user-provided information that comes from the OpenApi json, return a list in JSON of the most important test cases for the provided endpoint. Take into account strange situations , which can mess up the system

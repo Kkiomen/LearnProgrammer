@@ -6,6 +6,7 @@ enum OpenAiModel: string
 {
     case DAVINCI = 'text-davinci-003';
     case CHAT_GPT_3 = 'gpt-3.5-turbo';
+    case GPT_4 = 'gpt-4';
 
     case TEXT_EMBEDDING_ADA  = 'text-embedding-ada-002';
 

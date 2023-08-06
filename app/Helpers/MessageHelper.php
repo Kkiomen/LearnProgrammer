@@ -13,14 +13,6 @@ use Illuminate\Support\Facades\Auth;
 class MessageHelper
 {
 
-    public static function isCommand(MessageData $messageData): bool
-    {
-        if (!is_null($messageData->message)) {
-            return str_starts_with($messageData->message, Command::CHARACTER_STARTING_COMMAND);
-        }
-        return false;
-    }
-
     public static function isSnippet(MessageData $messageData): bool
     {
         return !is_null($messageData->mode);

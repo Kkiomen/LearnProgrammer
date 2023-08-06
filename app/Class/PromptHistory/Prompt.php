@@ -2,10 +2,10 @@
 
 namespace App\Class\PromptHistory;
 
-class PromptHistoryDTO
+class Prompt
 {
-    private string $prompt;
-    private string $system;
+    private ?string $prompt;
+    private ?string $system;
 
     public function __construct(string|null $prompt, string|null $system)
     {
@@ -13,7 +13,7 @@ class PromptHistoryDTO
         $this->system = $system ?? null;
     }
 
-    public function getPrompt(): string
+    public function getPrompt(): ?string
     {
         return $this->prompt;
     }
@@ -24,7 +24,7 @@ class PromptHistoryDTO
         return $this;
     }
 
-    public function getSystem(): string
+    public function getSystem(): ?string
     {
         return $this->system;
     }

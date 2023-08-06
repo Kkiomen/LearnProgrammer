@@ -48,13 +48,13 @@ class ChatController extends Controller
         $user = Auth::user();
         $messageData = new MessageData($user, $request->all());
 
-        if (MessageHelper::isCommand($messageData)) {
-            $messageContext->setStrategy(new CommandMessage($messageData));
-        } else if (MessageHelper::isSnippet($messageData)) {
-            $messageContext->setStrategy(new SnippetMessage($messageData));
-        } else {
-            $messageContext->setStrategy(new OpenAiMessage($messageData));
-        }
+//        if (MessageHelper::isCommand($messageData)) {
+//            $messageContext->setStrategy(new CommandMessage($messageData));
+//        } else if (MessageHelper::isSnippet($messageData)) {
+//            $messageContext->setStrategy(new SnippetMessage($messageData));
+//        } else {
+//            $messageContext->setStrategy(new OpenAiMessage($messageData));
+//        }
 
         $result = $messageContext->handle();
         if($result['fullResponse']){

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\MessageController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\ChatController;
 use App\Http\Controllers\Api\ProductDescriptionController;
@@ -9,7 +10,7 @@ use App\Http\Controllers\Api\GroupController;
 use App\Http\Controllers\Api\AvatarController;
 use App\Http\Controllers\Api\CloudController;
 use Illuminate\Support\Facades\Route;
-
+use App\Http\Controllers\Api\SessionController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -20,8 +21,16 @@ use Illuminate\Support\Facades\Route;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
+Route::post('/message/new', [MessageController::class, 'newMessage']);
+Route::post('/messages', [MessageController::class, 'getMessagesConversation']);
+Route::get('/session', [SessionController::class, 'generateSession']);
+
 
 Route::middleware('auth:sanctum')->group(function () {
+
+
+
+
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/user', [AuthController::class, 'getUser']);
     Route::get('/avatars', [AvatarController::class, 'getAvatars']);

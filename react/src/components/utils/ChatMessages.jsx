@@ -7,7 +7,7 @@ import rehypeRaw from "rehype-raw";
 import TestOpenApi from "../TestOpenApi.jsx";
 
 
-export default function ChatMessages({messages, regenerate, avatar}) {
+export default function ChatMessages({messages, regenerate, assistant}) {
 
   return (
       <div className="overflow-y-auto">
@@ -17,7 +17,7 @@ export default function ChatMessages({messages, regenerate, avatar}) {
 
             return (
               <div className="mx-2 sm:mx-8 my-6 text-md pb-12 message" key={message.id}>
-                <div className={isAi ? 'bg-ai-conversation-ai rounded-xl p-4 sm:p-8 pb-10 sm:pb-10' : 'bg-ai-conversation-me rounded-xl border border-ai-conversation-border p-4 sm:p-8 text-right'}>
+                <div className={isAi ? 'bg-ai-conversation-ai rounded-xl p-4 sm:p-8 pb-10 sm:pb-10 text-white' : 'bg-ai-conversation-me rounded-xl border border-ai-conversation-border p-4 sm:p-8 text-right text-white'}>
                   <div>
 
                     {
@@ -39,7 +39,7 @@ export default function ChatMessages({messages, regenerate, avatar}) {
                 {
                   isAi ? (
                     <div className="flex justify-between">
-                      <img src={avatar.img !== "null"  ? avatar.img : `/img/${avatar.short_name}.jpg`}
+                      <img src={assistant.img !== "null"  ? assistant.img : `/img/${assistant.short_name}.jpg`}
                            className="rounded-xl w-24 ml-8 bg-ai-conversation-page p-0.5" style={{marginTop: -1.5 + 'em'}}/>
 
                       <div className="mt-2 items-center flex gap-3  mr-3">

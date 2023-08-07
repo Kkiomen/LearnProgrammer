@@ -129,12 +129,22 @@ class ConversationRepository
         } else {
             // Save new message
             if ($conversationModel->save()) {
-                // Set the id of the DTO to the id of the saved model
-                $conversationModel->setId($conversationModel->id);
+                $conversation->setId($conversationModel->id);
                 return true;
             }
         }
 
+        return false;
+    }
+
+    public function unActiveBySessionHash(string $sessionHash): bool
+    {
+        $conversation = Conversation::where('session_hash', $sessionHash)->first();
+        if($conversation && $conversation->update([
+            'active' => false
+        ])){
+            return true;
+        }
         return false;
     }
 

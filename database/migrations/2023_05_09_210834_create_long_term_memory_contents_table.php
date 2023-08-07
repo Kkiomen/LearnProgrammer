@@ -15,7 +15,10 @@ return new class extends Migration
     {
         Schema::create('long_term_memory_contents', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('assistant_id')->nullable();
             $table->unsignedBigInteger('message_id')->nullable();
+            $table->string('type')->nullable()->comment('doc, text');
+            $table->string('link')->nullable();
             $table->text('content');
             $table->string('tags')->nullable();
             $table->boolean('sync')->default(false);

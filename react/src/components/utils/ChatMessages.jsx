@@ -10,7 +10,7 @@ import TestOpenApi from "../TestOpenApi.jsx";
 export default function ChatMessages({messages, regenerate, assistant}) {
 
   return (
-      <div className="overflow-y-auto">
+      <div className="h-full">
         <div className="messagesBox">
           {messages.map(message => {
             const isAi = message.sender === "ai";
@@ -23,11 +23,22 @@ export default function ChatMessages({messages, regenerate, assistant}) {
                     {
                       message && message.message && message.message.original !== null && isAi ? (
 
-                        <ReactMarkdown
-                          remarkPlugins={[remarkGfm]}
-                          rehypePlugins={[rehypeHighlight, rehypePrism, rehypeRaw]}
-                          children={message.loaded ? message.message.original : '<div className="ml-8 dot-flashing text-white"/>'}
-                        />
+                        <div>
+                          <ReactMarkdown
+                            remarkPlugins={[remarkGfm]}
+                            rehypePlugins={[rehypeHighlight, rehypePrism, rehypeRaw]}
+                            children={message.loaded ? message.message.original : '<div className="ml-8 dot-flashing text-white"/>'}
+                          />
+
+                          <div className="links">
+                            <div className="text-[#f9be2f] font-bold mt-5 text-[0.8rem]">Może Ci się przydać:</div>
+                            <div>
+                              <div className="text-[0.8rem]"><a href="http://localhost:3000/asystent/1">http://localhost:3000/asystent/1</a></div>
+                            </div>
+                          </div>
+
+
+                        </div>
                       ) : (
                         message.loaded ? message.message.original : <div className="ml-8 dot-flashing text-white"/>
                       )
@@ -49,11 +60,11 @@ export default function ChatMessages({messages, regenerate, assistant}) {
                           className="flex h-fit items-center select-none cursor-pointer gap-1 font-semibold bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300 group-hover:bg-gray-200 dark:group-hover:bg-gray-600 rounded px-2 py-0.5 p-1 text-xs">
                           Copy
                         </div>
-                        <div
-                          onClick={() => regenerate(message)}
-                          className="flex h-fit items-center select-none cursor-pointer gap-1 font-semibold bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300 group-hover:bg-gray-200 dark:group-hover:bg-gray-600 rounded px-2 py-0.5 p-1 text-xs">
-                          Regenerate response
-                        </div>
+                        {/*<div*/}
+                        {/*  onClick={() => regenerate(message)}*/}
+                        {/*  className="flex h-fit items-center select-none cursor-pointer gap-1 font-semibold bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300 group-hover:bg-gray-200 dark:group-hover:bg-gray-600 rounded px-2 py-0.5 p-1 text-xs">*/}
+                        {/*  Regenerate response*/}
+                        {/*</div>*/}
                       </div>
                     </div>
                   ) : (

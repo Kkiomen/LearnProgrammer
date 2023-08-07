@@ -23,6 +23,7 @@ return new class extends Migration
             $table->integer('sort')->default(1);
             $table->enum('type', AssistantType::toArray())->default(AssistantType::BASIC->value);
             $table->boolean('public')->default(true);
+            $table->text('memory_collection')->nullable();
             $table->timestamps();
         });
     }

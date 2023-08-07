@@ -18,6 +18,7 @@ class AssistantFactory
         AssistantType $type = null,
         bool $public = false,
         string $prompt = null,
+        string $memoryCollection = null
     ): AssistantInterface
     {
         $assistantDTO = new AssistantDTO();
@@ -29,6 +30,7 @@ class AssistantFactory
         $assistantDTO->setType($type ?? null);
         $assistantDTO->setPublic($public ?? false);
         $assistantDTO->setPromptHistory(new Prompt($prompt, null));
+        $assistantDTO->setMemoryCollection($memoryCollection);
         return $assistantDTO;
     }
 }

@@ -49,11 +49,11 @@ class MessageFacade
         }
 
         $responseMessageStrategy = $this->messageStrategyContext->handle();
+//        $message->setLinks($responseMessageStrategy->getLinks());
 
         //Update information about Prompt
         $this->messageService->updatePromptHistory($message, $responseMessageStrategy->getPrompt());
         $responseDTO = (new ResponseDTO())->setMessageDTO($message)->setResponseMessageStrategy($responseMessageStrategy);
-
         if ($responseMessageStrategy->getResponseType() === ResponseType::JSON) {
             return $this->responseHelper->responseJSON($responseDTO);
         }

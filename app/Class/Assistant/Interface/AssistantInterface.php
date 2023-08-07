@@ -22,4 +22,6 @@ interface AssistantInterface extends DTOInterface
     public function setType(AssistantType $type): self;
     public function getPublic(): ?bool;
     public function setPublic(?bool $public): self;
+    public function getMemoryCollection(): ?string;
+    public function setMemoryCollection(?string $memoryCollection): self;
 }

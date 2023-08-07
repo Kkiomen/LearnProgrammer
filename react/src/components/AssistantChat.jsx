@@ -16,27 +16,43 @@ export default function AssistantChat() {
   const [assistant, setAssistant] = useState([]);
   const [canSendMessage, setCanSendMessage] = useState(true);
   const [message, setMessage] = useState("");
+  const [sessionHash, setSessionHash] = useState("");
   const [cookies, setCookie, removeCookie] = useCookies(["sessionHash_" + assistantId]);
 
   useEffect(() => {
+    getAssistant();
     generateNewHash();
     getMessagesConversation();
   }, []);
 
   const generateNewHash = () => {
     if(cookies["sessionHash_" + assistantId] === undefined) {
-      axiosClient.get(`/session`)
-        .then(({data}) => {
-          setCookie("sessionHash_" + assistantId, data.session_hash)
-        })
+      generateHash();
+    }else{
+      setSessionHash(cookies["sessionHash_" + assistantId]);
     }
+  }
+
+  const generateHash = () => {
+    axiosClient.get(`/session`)
+      .then(({data}) => {
+        setSessionHash(data.session_hash);
+        setCookie("sessionHash_" + assistantId, data.session_hash)
+      })
+  }
+
+  const getAssistant = () => {
+    axiosClient.get(`/assistant/` + assistantId)
+      .then(({data}) => {
+        setAssistant(data);
+      })
   }
 
   const getSessionHash = () => {
     if(cookies["sessionHash_" + assistantId] === undefined) {
       generateNewHash();
     }
-    return cookies["sessionHash_" + assistantId];
+    return cookies["sessionHash_" + assistantId] ?? sessionHash;
   }
 
   const scrollToBottom = () => {
@@ -77,6 +93,26 @@ export default function AssistantChat() {
       })
   }
 
+  const getLinkForMessage = (message, assistantId, messageAi) => {
+    axiosClient.post(`/message/new/link`,{
+      message: message,
+      assistant: assistantId,
+    })
+      .then(({data}) => {
+        console.log(messageAi);
+        console.log(data);
+        setMessages((messages) =>
+          messages.map((m) =>
+            m.id === messageAi.id
+              ? {...m, links: data, loaded: true}
+              : m
+          )
+        );
+        console.log(messages);
+      })
+
+  }
+
   const handleTextChange = (event) => {
     const value = event.target.value;
     const isBackspaceOrDelete =
@@ -103,7 +139,7 @@ export default function AssistantChat() {
       payload = {
         message: message,
         assistant: assistantId,
-        session: getSessionHash()
+        session: sessionHash
       };
     }
 
@@ -181,8 +217,9 @@ export default function AssistantChat() {
 
         messageBuffer = messages.pop();
         messages.forEach(processMessage);
+        scrollToBottom();
         await readStream();
-
+        scrollToBottom();
         messages.map((m) =>
           m.id === aiMessage.id
             ? {...m, message: {id: id}, loaded: true}
@@ -196,7 +233,7 @@ export default function AssistantChat() {
 
     await readStream();
     // ====  CHAT GPT  ====
-
+    // getLinkForMessage(message, assistantId, aiMessage);
     getMessagesConversation();
     setMessage("");
     setCanSendMessage(true);
@@ -249,9 +286,14 @@ export default function AssistantChat() {
   };
 
   const clearConversation = () => {
-    axiosClient.get(`/chat/clear`)
+    axiosClient.post(`/messages/clear`, {
+      "session_hash": cookies["sessionHash_" + assistantId]
+    })
       .then(({data}) => {
-        setMessages([]);
+        setCookie("sessionHash_" + assistantId, undefined);
+        generateHash();
+        setMessage([]);
+        getMessagesConversation();
       })
     scrollToBottom();
   }
@@ -292,8 +334,8 @@ export default function AssistantChat() {
 
   return (
     <div className="mx-0 h-screen">
-      <Header/>
-      <div className="w-full  relative bg-ai-conversation-page flex flex-col justify-between h-screen">
+      <div className="w-full relative bg-ai-conversation-page flex flex-col justify-between h-screen">
+        <Header assistant={assistant} session={sessionHash}/>
         <div className="overflow-y-auto" id="chatBox" ref={chatRef}>
 
           <ChatMessages messages={messages} regenerate={regenerateResponse} assistant={assistant}/>

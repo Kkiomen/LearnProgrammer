@@ -18,8 +18,9 @@ class ConversationService
     ) {
     }
 
-    public function clearConversation(): void
+    public function clearConversation(string $sessionHash): bool
     {
+        return $this->conversationRepository->unActiveBySessionHash($sessionHash);
     }
 
     public function getOrCreateConversationForNewMessage(RequestDTO $requestDTO): ConversationInterface
@@ -27,18 +28,14 @@ class ConversationService
         if($requestDTO->getSessionHash() !== null){
             $conversation = $this->getConversation(null, $requestDTO->getSessionHash(), true);
         }
-
-        if(!isset($conversation) || $conversation === null){
+        if(!$conversation || $conversation === null){
             $conversation = $this->createConversation(
                 assistantId: $requestDTO->getAssistantId(),
                 consultantId: $requestDTO->getConsultantId(),
                 sessionHash: $requestDTO->getSessionHash(),
                 active: true,
                 conversationStatus: ConversationStatus::ASSISTANT);
-
         }
-
-
         return $conversation;
     }
 
@@ -81,9 +78,14 @@ class ConversationService
         return null;
     }
 
-    public function getMessagesForView(string $sessionHash): array
+    public function getMessagesForView(string|null $sessionHash): array
     {
         $result = [];
+
+        if($sessionHash === null){
+            return [];
+        }
+
         $messages = $this->conversationRepository->getMessagesBySessionHash($sessionHash);
 
         /**

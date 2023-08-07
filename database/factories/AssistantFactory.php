@@ -17,14 +17,16 @@ class AssistantFactory extends Factory
      */
     public function definition()
     {
+        $name = fake()->word();
         return [
             'img_url' => fake()->imageUrl(),
-            'name' => fake()->sentence(1),
+            'name' => $name,
             'short_name' => 'Assistant',
             'prompt' => 'Example prompt',
             'sort' => fake()->numberBetween(0, 1),
             'type' => AssistantType::BASIC->value,
             'public' => true,
+            'memory_collection' => $name
         ];
     }
 }

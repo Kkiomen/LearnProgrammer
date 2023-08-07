@@ -25,7 +25,6 @@ class PointStruct
                 [
                     'id' => $this->id,
                     'payload' => $this->vector->getPayload(),
-//                    'payload' => ['ccc' => 'gdfgdf'],
                     'vector' => $this->vector->getVector()
                 ]
             ]

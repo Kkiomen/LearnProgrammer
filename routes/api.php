@@ -23,8 +23,9 @@ use App\Http\Controllers\Api\SessionController;
 */
 Route::post('/message/new', [MessageController::class, 'newMessage']);
 Route::post('/messages', [MessageController::class, 'getMessagesConversation']);
+Route::post('/messages/clear', [MessageController::class, 'clearConversation']);
 Route::get('/session', [SessionController::class, 'generateSession']);
-
+Route::get('/assistant/{assistantId}', [\App\Http\Controllers\Api\AssistantController::class, 'getAssistantInfo']);
 
 Route::middleware('auth:sanctum')->group(function () {
 

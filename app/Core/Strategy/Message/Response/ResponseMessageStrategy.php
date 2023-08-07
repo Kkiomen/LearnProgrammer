@@ -13,6 +13,7 @@ class ResponseMessageStrategy
     private ?array $other;
     private ResponseType $responseType;
     private MessageDTO $messageDTO;
+    private array $links;
 
     public function __construct()
     {
@@ -74,4 +75,17 @@ class ResponseMessageStrategy
         $this->messageDTO = $messageDTO;
         return $this;
     }
+
+    public function getLinks(): array
+    {
+        return $this->links;
+    }
+
+    public function setLinks(array $links): self
+    {
+        $this->links = $links;
+        return $this;
+    }
+
+
 }

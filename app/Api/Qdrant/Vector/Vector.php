@@ -5,13 +5,13 @@ namespace App\Api\Qdrant\Vector;
 class Vector
 {
     private ?array $payload;
-    private array $vector;
+    private ?array $vector;
 
     /**
-     * @param array $embedding
-     * @param array|null $payload
+     * @param  array|null  $embedding
+     * @param  array|null  $payload
      */
-    public function __construct(array $embedding, array $payload = null)
+    public function __construct(array $embedding = null, array $payload = null)
     {
         $this->payload = $payload;
         $this->vector = $embedding;

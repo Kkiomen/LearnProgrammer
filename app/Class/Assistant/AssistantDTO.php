@@ -17,6 +17,8 @@ class AssistantDTO extends Dto implements AssistantInterface
     private ?AssistantType $type;
     private ?bool $public;
 
+    private ?string $memoryCollection;
+
     public function getImgUrl(): ?string
     {
         return $this->imgUrl;
@@ -68,7 +70,9 @@ class AssistantDTO extends Dto implements AssistantInterface
 
     public function setSort(?int $sort): self
     {
-        $this->sort = $sort;
+        if($sort > 0){
+            $this->sort = $sort;
+        }
         return $this;
     }
 
@@ -93,4 +97,17 @@ class AssistantDTO extends Dto implements AssistantInterface
         $this->public = $public;
         return $this;
     }
+
+    public function getMemoryCollection(): ?string
+    {
+        return $this->memoryCollection ?? 'memory';
+    }
+
+    public function setMemoryCollection(?string $memoryCollection): self
+    {
+        $this->memoryCollection = $memoryCollection;
+        return $this;
+    }
+
+
 }

@@ -23,6 +23,7 @@ return new class extends Migration
             $table->text('prompt')->nullable();
             $table->text('system')->nullable();
             $table->text('result')->nullable();
+            $table->text('links')->nullable();
             $table->timestamps();
         });
     }

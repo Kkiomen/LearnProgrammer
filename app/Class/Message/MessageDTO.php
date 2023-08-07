@@ -44,6 +44,8 @@ class MessageDTO extends Dto implements MessageInterface
      */
     private ?string $result;
 
+    private ?string $links;
+
     /**
      * @param  Prompt|null  $promptHistory
      */
@@ -203,5 +205,15 @@ class MessageDTO extends Dto implements MessageInterface
         return $this;
     }
 
+    public function getLinks(): ?string
+    {
+        return $this->links ?? null;
+    }
+
+    public function setLinks(?string $links): self
+    {
+        $this->links = $links;
+        return $this;
+    }
 
 }

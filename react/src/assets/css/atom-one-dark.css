@@ -37,7 +37,10 @@ hue-6-2: #e6c07b
 .messagesBox code{
     font-family: 'JetBrains Mono', monospace;
 }
-
+.messagesBox .links a{
+    color: white;
+    font-weight: normal;
+}
 
 .hljs {
     background-color: transparent;

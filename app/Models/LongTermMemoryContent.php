@@ -8,7 +8,14 @@ use Illuminate\Database\Eloquent\Model;
 class LongTermMemoryContent extends Model
 {
     use HasFactory;
+
     protected $fillable = [
-        'message_id', 'content', 'tags', 'sync'
+        'assistant_id',
+        'message_id',
+        'content',
+        'tags',
+        'sync',
+        'type',
+        'link',
     ];
 }

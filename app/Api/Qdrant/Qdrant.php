@@ -44,9 +44,23 @@ class Qdrant
         $response = Http::post($url, $searchRequest->getPayload());
         if(isset($response->json()['status']) && $response->json()['status'] === 'ok'){
             return $response->json()['result'];
-            return $this->filterLongTermMatches($response->json()['result']);
         }
         return [];
+    }
+
+    public function delete(PointStruct $pointStruct): bool{
+        $this->createCollection($pointStruct->getNameCollection());
+        $url = $this->getQdrantUrl() . '/collections/' . $pointStruct->getNameCollection() . '/points/delete';
+        $response = Http::post($url, [
+            'points' => [
+                $pointStruct->getId()
+            ]
+        ]);
+        if(isset($response->json()['status']) && $response->json()['status'] === 'ok'){
+            return true;
+        }
+
+        return false;
     }
 
 

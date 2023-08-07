@@ -6,6 +6,7 @@ use App\Api\OpenAiApi;
 use App\Api\Qdrant\PointStruct;
 use App\Api\Qdrant\Qdrant;
 use App\Api\Qdrant\Search\SearchRequest;
+use App\Api\Qdrant\Vector\Vector;
 use App\Api\Qdrant\Vector\VectorText;
 use App\Models\LongTermMemoryContent;
 use App\Models\Message;
@@ -28,7 +29,7 @@ class LongTermMemoryQdrant
      * @return bool Returns true if the memory was successfully saved, false otherwise.
      * @throws \Exception
      */
-    public function save(string $content, ?Message $message = null): bool
+    public function save(string $content, ?Message $message = null, string $nameCollection = 'memory'): bool
     {
         $content = $this->getContentFromMessage($content, $message);
         $tags = $this->openAiApi->makeTags($content);
@@ -39,15 +40,34 @@ class LongTermMemoryQdrant
                 id: $longTerm->id,
                 vector: new VectorText(
                     openAiApi: $this->openAiApi,
-                    text: $longTerm->content
+                    text: $longTerm->content,
+                    payload: [
+                        'indetificator' => $longTerm->id,
+                        'message' => $longTerm->content
+                        ]
                 ),
-                nameCollection: 'memory'
+                nameCollection: $nameCollection
             )
         )) {
             $this->markLongTermMemoryAsSynced($longTerm);
             return true;
         }
 
+        return false;
+    }
+
+    public function remove(int $id, string $nameCollection = 'memory'): bool
+    {
+        if($this->qdrant->delete(
+            new PointStruct(
+                id: $id,
+                vector: new Vector(),
+                nameCollection: $nameCollection
+            )
+        )){
+            LongTermMemoryContent::where('id', $id)->delete();
+            return true;
+        }
         return false;
     }
 
@@ -58,15 +78,19 @@ class LongTermMemoryQdrant
      * @return array|null Returns an array with the best matching long-term memory entities, or null if no match is found.
      * @throws \Exception
      */
-    public function getMemory(string $content, ?Message $message = null){
+    public function getMemory(string $content, ?Message $message = null, string $nameCollection = 'memory', bool $onlyLinks = false){
         $content = $this->getContentFromMessage($content, $message);
         $result = $this->qdrant->search(new SearchRequest(
             vector: new VectorText(
                 openAiApi: $this->openAiApi,
                 text: $content
             ),
-            nameCollection: 'memory'
+            nameCollection: $nameCollection
         ));
+
+        if($onlyLinks){
+            return $this->getOnlyLinksForResult($result);
+        }
         return $this->filterLongTermMatches($result);
     }
 
@@ -76,12 +100,30 @@ class LongTermMemoryQdrant
             return [];
         }
 
-        $result = array();
+        $result = [];
         foreach ($matches as $match) {
-            if ($match['score'] > 0.7) {
+            if ($match['score'] > 0.79) {
                 $longTerm = LongTermMemoryContent::where('id', $match['id'])->first();
                 if($longTerm){
                     $result[] = $longTerm->content;
+                }
+            }
+        }
+        return $result;
+    }
+
+    private function getOnlyLinksForResult(?array $matches): array
+    {
+        if(empty($matches)){
+            return [];
+        }
+
+        $result = [];
+        foreach ($matches as $match) {
+            if ($match['score'] > 0.79) {
+                $longTerm = LongTermMemoryContent::where('id', $match['id'])->first();
+                if($longTerm && !empty($longTerm->link)){
+                    $result[] = $longTerm->link;
                 }
             }
         }

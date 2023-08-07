@@ -10,7 +10,7 @@ class Assistant extends Model
 {
     use HasFactory;
     protected $fillable = [
-      'imgUrl', 'name', 'short_name', 'prompt', 'sort', 'type', 'public'
+      'imgUrl', 'name', 'short_name', 'prompt', 'sort', 'type', 'public', 'memory_collection'
     ];
 
     protected $casts = [

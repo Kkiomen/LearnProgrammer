@@ -49,7 +49,7 @@ class MessageFacade
         }
 
         $responseMessageStrategy = $this->messageStrategyContext->handle();
-//        $message->setLinks($responseMessageStrategy->getLinks());
+        $message->setLinks(implode(';', $responseMessageStrategy->getLinks()));
 
         //Update information about Prompt
         $this->messageService->updatePromptHistory($message, $responseMessageStrategy->getPrompt());

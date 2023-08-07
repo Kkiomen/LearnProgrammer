@@ -33,7 +33,8 @@ final class MessageMapper extends Mapper
             prompt: $model->prompt,
             system: $model->system,
             userId: $model->user_id,
-            result: $model->result
+            result: $model->result,
+            links: $model->links
         );
     }
 
@@ -49,6 +50,7 @@ final class MessageMapper extends Mapper
         $message->prompt = $dtoClass->getPromptHistory()->getPrompt() ?? null;
         $message->system = $dtoClass->getPromptHistory()->getSystem() ?? null;
         $message->result = $dtoClass->getResult() ?? null;
+        $message->links = $dtoClass->getLinks() ?? null;
 
         return $message;
     }

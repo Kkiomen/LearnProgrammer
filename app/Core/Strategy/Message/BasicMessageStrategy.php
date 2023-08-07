@@ -20,7 +20,7 @@ class BasicMessageStrategy extends MessageStrategy
         $response->setContent($this->requestDTO->getMessage());
         $response->setPrompt(new Prompt($this->requestDTO->getMessage(), $this->assistantDTO->getPromptHistory()->getPrompt()));
         $this->loadLongTermMemory($response);
-//        $this->loadLongTermLinks($response);
+        $this->loadLongTermLinks($response);
 
         $response->setResponseType(ResponseType::STREAM);
         return $response;

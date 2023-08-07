@@ -95,13 +95,21 @@ class ConversationService
             if($message->getResult() !== null){
                 $result[] = [
                     'sender' => 'user',
-                    'content' => $message->getContent()
+                    'content' => $message->getContent(),
+
                 ];
 
-                $result[] = [
+                $ai = [
                     'sender' => 'assistant',
-                    'content' => $message->getResult()
+                    'content' => $message->getResult(),
+
                 ];
+
+                if(!empty($message->getLinks())){
+                    $result[] = array_merge($ai, ['links' => explode(';', $message->getLinks()) ?? []]);
+                }else{
+                    $result[] = $ai;
+                }
             }
 
         }

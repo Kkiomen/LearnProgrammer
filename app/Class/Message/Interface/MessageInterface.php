@@ -21,4 +21,6 @@ interface MessageInterface extends DTOInterface
     public function setUserId(?int $userId): self;
     public function getResult(): ?string;
     public function setResult(string|null $result): self;
+    public function setLinks(?string $links): self;
+    public function getLinks(): ?string;
 }

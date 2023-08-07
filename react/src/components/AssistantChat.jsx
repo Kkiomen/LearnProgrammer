@@ -82,6 +82,7 @@ export default function AssistantChat() {
             {
               sender: currentSender,
               message: {original: message.content},
+              links: message.links,
               id: generateUniqueId(messages),
               translated: false,
               loaded: true,

@@ -11,8 +11,4 @@ class Message extends Model
     protected $fillable = [
       'user_id', 'conversation_id', 'content', 'sender_class', 'sender_id', 'prompt', 'system', 'result', 'links'
     ];
-
-    protected $casts = [
-        'links' => 'array'
-    ];
 }

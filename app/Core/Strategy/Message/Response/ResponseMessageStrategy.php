@@ -76,9 +76,9 @@ class ResponseMessageStrategy
         return $this;
     }
 
-    public function getLinks(): array
+    public function getLinks(): ?array
     {
-        return $this->links;
+        return $this->links ?? null;
     }
 
     public function setLinks(array $links): self

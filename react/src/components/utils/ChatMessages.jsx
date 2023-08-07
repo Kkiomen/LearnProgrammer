@@ -30,12 +30,19 @@ export default function ChatMessages({messages, regenerate, assistant}) {
                             children={message.loaded ? message.message.original : '<div className="ml-8 dot-flashing text-white"/>'}
                           />
 
-                          <div className="links">
-                            <div className="text-[#f9be2f] font-bold mt-5 text-[0.8rem]">Może Ci się przydać:</div>
-                            <div>
-                              <div className="text-[0.8rem]"><a href="http://localhost:3000/asystent/1">http://localhost:3000/asystent/1</a></div>
-                            </div>
-                          </div>
+                          {
+                            typeof message.links !== 'undefined' && message.links.length > 0 && (
+                              <div className="links">
+                                <div className="text-[#f9be2f] font-bold mt-5 text-[0.8rem]">Może Ci się przydać:</div>
+                                <div>
+                                  {message.links.map(link => {
+                                    return <div className="text-[0.8rem]"><a href={link}>{link}</a></div>
+                                  })}
+                                </div>
+                              </div>
+                            )
+                          }
+
 
 
                         </div>

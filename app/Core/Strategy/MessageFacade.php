@@ -5,6 +5,7 @@ namespace App\Core\Strategy;
 use App\Class\Assistant\AssistantDTO;
 use App\Class\Assistant\Enum\AssistantType;
 use App\Class\Assistant\Repository\AssistantRepository;
+use App\Class\Message\Interface\MessageInterface;
 use App\Core\Class\Request\Factory\RequestDTOFactory;
 use App\Core\Class\Request\RequestDTO;
 use App\Core\Class\Response\ResponseDTO;
@@ -15,6 +16,7 @@ use App\Core\Helper\ResponseHelper;
 use App\Core\Strategy\Message\BasicMessageStrategy;
 use App\Core\Strategy\Message\ComplaintMessageStrategy;
 use App\Core\Strategy\Message\MessageStrategyContext;
+use App\Core\Strategy\Message\Response\ResponseMessageStrategy;
 use App\Services\MessageService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -34,40 +36,105 @@ class MessageFacade
     ) {
     }
 
+    /**
+     * Processes a request to handle a new message and returns a respon
+     *
+     * @return JsonResponse|StreamedResponse
+     */
     public function processAndReturnResponse(): JsonResponse|StreamedResponse
     {
-        /**
-         * @var AssistantDTO $assistant
-         */
-        $assistant = $this->assistantRepository->getAssistantById($this->requestDto->getAssistantId());
-        $message = $this->messageService->createMessageFromRequestDto($this->requestDto);
+        $assistant = $this->fetchAssistant();
+        $message = $this->createMessage();
 
-        /**
-         * Handle Event
-         */
-        $event = $this->eventHandler->flush((new EventData())
-            ->setContent($message->getContent())
-            ->setAssistantId($this->requestDto->getAssistantId()));
-        if($event->isChangedContent()){
-            $message->setContentFromEvent($event->getContent());
-        }
-
-
-        if ($assistant->getType() === AssistantType::BASIC) {
-            $this->messageStrategyContext->setStrategy(new BasicMessageStrategy($this->requestDto));
-        } else {
-            if ($assistant->getType() === AssistantType::COMPLAINT) {
-                $this->messageStrategyContext->setStrategy(new ComplaintMessageStrategy($this->requestDto));
-            }
-        }
+        $this->handleEventAndUpdateMessage($message);
+        $this->setMessageStrategy($assistant);
 
         $responseMessageStrategy = $this->messageStrategyContext->handle();
         $responseMessageStrategy->setType($assistant->getType());
-        $message->setLinks(implode(';', $responseMessageStrategy->getLinks() ?? []));
 
-        //Update information about Prompt
+        $this->updateMessageAndHistory($message, $responseMessageStrategy);
+
+        return $this->prepareResponse($responseMessageStrategy, $message);
+    }
+
+
+    /**
+     * Fetch assistant data.
+     *
+     * @return AssistantDTO
+     */
+    private function fetchAssistant(): AssistantDTO
+    {
+        return $this->assistantRepository->getAssistantById($this->requestDto->getAssistantId());
+    }
+
+    /**
+     * Create message from RequestDTO.
+     *
+     * @return MessageInterface
+     */
+    private function createMessage(): MessageInterface
+    {
+        return $this->messageService->createMessageFromRequestDto($this->requestDto);
+    }
+
+    /**
+     * Handle event and update message content if necessary.
+     *
+     * @param MessageInterface $message
+     */
+    private function handleEventAndUpdateMessage(MessageInterface $message): void
+    {
+        $event = $this->eventHandler->execute((new EventData())
+            ->setContent($message->getContent())
+            ->setAssistantId($this->requestDto->getAssistantId()));
+
+        if ($event->isChangedContent()) {
+            $message->setContentFromEvent($event->getContent());
+        }
+    }
+
+    /**
+     * Sets the appropriate message handling strategy based on the type of assistant.
+     *
+     * @param AssistantDTO $assistant
+     */
+    private function setMessageStrategy(AssistantDTO $assistant): void
+    {
+        $strategy = match ($assistant->getType()) {
+            AssistantType::BASIC => new BasicMessageStrategy($this->requestDto),
+            AssistantType::COMPLAINT => new ComplaintMessageStrategy($this->requestDto),
+            default => throw new \InvalidArgumentException("Invalid assistant type"),
+        };
+
+        $this->messageStrategyContext->setStrategy($strategy);
+    }
+
+    /**
+     * Update the message and prompt history.
+     *
+     * @param MessageInterface $message
+     * @param ResponseMessageStrategy $responseMessageStrategy
+     */
+    private function updateMessageAndHistory(MessageInterface $message, ResponseMessageStrategy $responseMessageStrategy): void
+    {
+        $message->setLinks(implode(';', $responseMessageStrategy->getLinks() ?? []));
         $this->messageService->updatePromptHistory($message, $responseMessageStrategy->getPrompt());
-        $responseDTO = (new ResponseDTO())->setMessageDTO($message)->setResponseMessageStrategy($responseMessageStrategy);
+    }
+
+    /**
+     * Prepare and return the response.
+     *
+     * @param ResponseMessageStrategy $responseMessageStrategy
+     * @param MessageInterface $message
+     * @return JsonResponse|StreamedResponse
+     */
+    private function prepareResponse(ResponseMessageStrategy $responseMessageStrategy, MessageInterface $message): JsonResponse|StreamedResponse
+    {
+        $responseDTO = (new ResponseDTO())
+            ->setMessageDTO($message)
+            ->setResponseMessageStrategy($responseMessageStrategy);
+
         if ($responseMessageStrategy->getResponseType() === ResponseType::JSON) {
             return $this->responseHelper->responseJSON($responseDTO);
         }
@@ -87,6 +154,4 @@ class MessageFacade
             others: $request->get('others') ?? null,
         );
     }
-
-
 }

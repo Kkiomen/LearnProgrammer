@@ -4,7 +4,7 @@ namespace App\Api\Qdrant\Vector;
 
 use App\Api\OpenAiApi;
 
-class VectorText extends Vector
+ final class VectorText extends Vector
 {
     private string $text;
     private OpenAiApi $openAiApi;

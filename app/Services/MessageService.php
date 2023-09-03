@@ -23,6 +23,12 @@ class MessageService
     {
     }
 
+    /**
+     * Creates a message from a RequestDTO.
+     *
+     * @param RequestDTO $requestDTO
+     * @return MessageInterface|null
+     */
     public function createMessageFromRequestDto(RequestDTO $requestDTO): MessageInterface|null
     {
         $conversation = $this->conversationService->getOrCreateConversationForNewMessage($requestDTO);
@@ -40,18 +46,47 @@ class MessageService
         );
     }
 
+    /**
+     * Updates the prompt history associated with a message.
+     *
+     * @param MessageInterface $messageDTO
+     * @param Prompt $prompt
+     * @return bool
+     */
     public function updatePromptHistory(MessageInterface $messageDTO, Prompt $prompt): bool
     {
         $messageDTO->setPromptHistory($prompt);
         return $this->messageRepository->save($messageDTO);
     }
 
+    /**
+     * Updates the OpenAI API result associated with a message.
+     *
+     * @param MessageInterface $messageDTO
+     * @param string $resultOpenAiApi
+     * @return bool
+     */
     public function updateResultOpenAi(MessageInterface $messageDTO, string $resultOpenAiApi): bool
     {
         $messageDTO->setResult($resultOpenAiApi);
         return $this->messageRepository->save($messageDTO);
     }
 
+    /**
+     * Creates a message.
+     *
+     * @param int|null $id
+     * @param int|null $conversationId
+     * @param string|null $content
+     * @param int|null $senderId
+     * @param string|null $senderClass
+     * @param array $urls
+     * @param array $images
+     * @param string|null $prompt
+     * @param string|null $system
+     * @param int|null $userId
+     * @return MessageInterface|null
+     */
     public function createMessage(
         int $id = null,
         int $conversationId = null,
@@ -85,6 +120,12 @@ class MessageService
         return null;
     }
 
+    /**
+     * Creates the first message in a conversation if an assistant has a start message.
+     *
+     * @param AssistantInterface $assistant
+     * @param ConversationInterface $conversation
+     */
     private function createFirstMessage(AssistantInterface $assistant, ConversationInterface $conversation): void
     {
         if($assistant->getStartMessage() !== null){

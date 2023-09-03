@@ -5,7 +5,7 @@ namespace App\Api\Qdrant;
 use App\Api\Qdrant\Search\SearchRequest;
 use Illuminate\Support\Facades\Http;
 
-class Qdrant
+final class Qdrant
 {
     private ?string $host = null;
     private ?int $port = null;

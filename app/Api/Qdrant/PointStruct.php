@@ -4,7 +4,7 @@ namespace App\Api\Qdrant;
 
 use App\Api\Qdrant\Vector\Vector;
 
-class PointStruct
+final class PointStruct
 {
 
     private int $id;

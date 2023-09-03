@@ -9,7 +9,7 @@ use App\Core\Dto\EventData;
 use App\Core\Dto\EventResponseDto;
 use App\Models\LongTermMemoryContent;
 
-class SaveEvent extends Event
+final class SaveEvent extends Event
 {
     protected ?string $name = 'save';
     protected ?string $description = 'save/remember information in memory';
@@ -21,6 +21,13 @@ class SaveEvent extends Event
     {
     }
 
+    /**
+     * Handle the event.
+     *
+     * @param  EventData  $eventData  Data related to the event
+     * @return EventResponseDto Response after handling the event
+     * @throws \Exception
+     */
     public function handle(EventData $eventData): EventResponseDto
     {
         /**
@@ -36,8 +43,9 @@ class SaveEvent extends Event
             $longTermMemory->assistant_id = $eventData->getAssistantId();
             $longTermMemory->type = 'TEXT';
             $longTermMemory->save();
+        }else{
+            $eventData->setContent('Inform that unfortunately the information could not be added to the memory');
         }
-
 
         $response = new EventResponseDto($this->getName());
         $response->setContent($eventData->getContent())

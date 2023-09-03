@@ -13,14 +13,20 @@ use App\Services\MessageService;
 use Illuminate\Http\JsonResponse;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
-final class ResponseHelper
+final readonly class ResponseHelper
 {
     public function __construct(
-        private readonly OpenAiApi $openAiApi,
-        private readonly MessageService $messageService
+        private OpenAiApi $openAiApi,
+        private MessageService $messageService
     ) {
     }
 
+    /**
+     * Generates a JSON response.
+     *
+     * @param ResponseDTO|array $response
+     * @return JsonResponse
+     */
     public function responseJSON(ResponseDTO|array $response): JsonResponse
     {
         if (is_array($response)) {
@@ -33,6 +39,12 @@ final class ResponseHelper
         ]);
     }
 
+    /**
+     * Generates a streamed response.
+     *
+     * @param ResponseDTO $response
+     * @return StreamedResponse
+     */
     public function responseStream(ResponseDTO $response): StreamedResponse
     {
         $prompt = (empty($response->getMessageDTO()->getContentFromEvent())) ? $response->getResponseMessageStrategy()->getPrompt()->getPrompt() : $response->getMessageDTO()->getContentFromEvent();;
@@ -65,7 +77,7 @@ final class ResponseHelper
     }
 
     /**
-     * Sends a message via Server-Sent Events.
+     * Sends a message via Server-Sent Events (SSE).
      * @param $data
      * @param $event
      * @return void

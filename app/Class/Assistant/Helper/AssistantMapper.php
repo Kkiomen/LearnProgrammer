@@ -30,7 +30,8 @@ class AssistantMapper extends Mapper
             type: $model->type,
             public: $model->public,
             prompt: $model->prompt,
-            memoryCollection: $model->memory_collection
+            memoryCollection: $model->memory_collection,
+            startMessage: $model->start_message,
         );
     }
 
@@ -46,6 +47,7 @@ class AssistantMapper extends Mapper
         $assistant->public = $dtoClass->getPublic();
         $assistant->prompt = $dtoClass->getPromptHistory()->getPrompt();
         $assistant->memory_collection = $dtoClass->getMemoryCollection();
+        $assistant->start_message = $dtoClass->getStartMessage();
         return $assistant;
     }
 }

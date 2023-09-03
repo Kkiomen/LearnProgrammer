@@ -46,12 +46,15 @@ class MessageDTO extends Dto implements MessageInterface
 
     private ?string $links;
 
+    private ?string $contentFromEvent;
+
     /**
      * @param  Prompt|null  $promptHistory
      */
     public function __construct()
     {
         $this->promptHistory = new Prompt(null, null);
+        $this->contentFromEvent = null;
     }
 
 
@@ -216,4 +219,24 @@ class MessageDTO extends Dto implements MessageInterface
         return $this;
     }
 
+    public function getConversationId(): ?int
+    {
+        return $this->conversationId;
+    }
+
+    public function setConversationId(?int $conversationId): void
+    {
+        $this->conversationId = $conversationId;
+    }
+
+    public function getContentFromEvent(): string
+    {
+        return $this->contentFromEvent ?? false;
+    }
+
+    public function setContentFromEvent(string $contentFromEvent): self
+    {
+        $this->contentFromEvent = $contentFromEvent;
+        return $this;
+    }
 }

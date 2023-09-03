@@ -2,6 +2,9 @@
 
 namespace App\Services;
 
+use App\Class\Assistant\Interface\AssistantInterface;
+use App\Class\Assistant\Repository\AssistantRepository;
+use App\Class\Conversation\Interface\ConversationInterface;
 use App\Class\Message\Factory\MessageDTOFactory;
 use App\Class\Message\Interface\MessageInterface;
 use App\Class\Message\Repository\MessageRepository;
@@ -14,7 +17,8 @@ class MessageService
     public function __construct(
         private readonly ConversationService $conversationService,
         private readonly MessageDTOFactory $messageDTOFactory,
-        private readonly MessageRepository $messageRepository
+        private readonly MessageRepository $messageRepository,
+        private readonly AssistantRepository $assistantRepository
     )
     {
     }
@@ -22,6 +26,12 @@ class MessageService
     public function createMessageFromRequestDto(RequestDTO $requestDTO): MessageInterface|null
     {
         $conversation = $this->conversationService->getOrCreateConversationForNewMessage($requestDTO);
+
+        $assistant = $this->assistantRepository->getAssistantById($requestDTO->getAssistantId());
+
+        if($assistant !== null){
+            $this->createFirstMessage($assistant, $conversation);
+        }
 
         return $this->createMessage(
             conversationId: $conversation->getId(),
@@ -73,5 +83,17 @@ class MessageService
         }
 
         return null;
+    }
+
+    private function createFirstMessage(AssistantInterface $assistant, ConversationInterface $conversation): void
+    {
+        if($assistant->getStartMessage() !== null){
+            $this->createMessage(
+                conversationId: $conversation->getId(),
+                content: $assistant->getStartMessage(),
+                senderId: $assistant->getId(),
+                senderClass: AssistantInterface::class
+            );
+        }
     }
 }

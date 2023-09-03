@@ -23,7 +23,7 @@ class AssistantService
 
     public function getById($assistantId): AssistantInterface|null
     {
-        return $this->assistantRepository->getAssistantById($assistantId);
+        return $this->assistantRepository->getAssistantById($assistantId) ?? null;
     }
 
     public function getAssistantMemory(AssistantInterface $assistant): \Illuminate\Database\Eloquent\Collection

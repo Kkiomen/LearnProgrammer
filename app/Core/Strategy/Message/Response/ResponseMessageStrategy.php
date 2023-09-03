@@ -2,6 +2,7 @@
 
 namespace App\Core\Strategy\Message\Response;
 
+use App\Class\Assistant\Enum\AssistantType;
 use App\Class\Message\MessageDTO;
 use App\Class\PromptHistory\Prompt;
 use App\Core\Enum\ResponseType;
@@ -14,6 +15,7 @@ class ResponseMessageStrategy
     private ResponseType $responseType;
     private MessageDTO $messageDTO;
     private array $links;
+    private ?AssistantType $type;
 
     public function __construct()
     {
@@ -87,5 +89,13 @@ class ResponseMessageStrategy
         return $this;
     }
 
+    public function getType(): ?AssistantType
+    {
+        return $this->type;
+    }
 
+    public function setType(?AssistantType $type): void
+    {
+        $this->type = $type;
+    }
 }

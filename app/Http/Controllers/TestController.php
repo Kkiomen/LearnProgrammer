@@ -9,6 +9,7 @@ use App\Api\Qdrant\Vector\VectorText;
 use App\Class\Conversation\Repository\ConversationRepository;
 use App\Class\LongTermMemory;
 use App\Class\LongTermMemoryQdrant;
+use App\Jobs\ComplaintGenerate;
 use App\Strategy\Message\MessageContext;
 use Cscheide\ArticleExtractor\ArticleExtractor;
 use Illuminate\Http\Request;
@@ -31,13 +32,18 @@ class TestController
 
     public function test(Request $request, MessageContext $messageContext)
     {
-        /**
-         * @var ConversationRepository $convRepo
-         */
-        $convRepo = app(ConversationRepository::class);
+//        /**
+//         * @var ConversationRepository $convRepo
+//         */
+//        $convRepo = app(ConversationRepository::class);
+//
+//        dump($convRepo->getMessagesBySessionHash('d1ce2a50-24a3-44f4-9b30-0aec2878600f'));
 
-        dump($convRepo->getMessagesBySessionHash('d1ce2a50-24a3-44f4-9b30-0aec2878600f'));
-
+        ComplaintGenerate::dispatch('[SUMMARY]:
+Przedmiot reklamacji: Słuchawki Airpods Pro
+Opis reklamacji: Słuchawki nie ładują się pomimo działającego kabla ładowania. Słuchawki nie reagują na ładowanie, jednak kabel ładowania działa poprawnie na innych urządzeniach.
+Przewidywany czas rozpatrzenia reklamacji: Do 3 tygodni od momentu zgłoszenia reklamacji.
+Wynik reklamacji: Wymiana na nowy egzemplarz słuchawek Airpods Pro.');
 
 
 //        foreach ($this->openAiApi->getModels()['data'] as $model){
@@ -45,7 +51,7 @@ class TestController
 //        }
 
 //        dump($this->longTermMemory->save('Jako jeden z benefitów dajemy karte multisport i ubezpieczenie na życie'));
-        dump($this->longTermMemory->getMemory('Jakie benefity dajecie?'));
+//        dump($this->longTermMemory->getMemory('Jakie benefity dajecie?'));
 //        dump($this->qdrant->search(new SearchRequest(
 //            vector: new VectorText(
 //                openAiApi: $this->openAiApi,

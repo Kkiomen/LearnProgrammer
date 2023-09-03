@@ -26,7 +26,7 @@ class Qdrant
     public function addVector(PointStruct $pointStruct): bool
     {
         $this->createCollection($pointStruct->getNameCollection());
-        $url = $this->getQdrantUrl() . '/collections/' . $pointStruct->getNameCollection() . '/points';
+        $url = $this->getQdrantUrl() . '/collections/' . $pointStruct->getNameCollection() . '/points?wait=true';
         $response = Http::put($url, $pointStruct->getPayload());
         if(isset($response->json()['status']) && $response->json()['status'] === 'ok'){
             return true;

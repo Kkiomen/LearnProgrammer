@@ -23,7 +23,9 @@ class AssistantController extends Controller
 
         return $this->responseHelper->responseJSON([
             'name' => $assistant?->getName(),
-            'img' => $assistant?->getImgUrl()
+            'img' => $assistant?->getImgUrl(),
+            'start_message' => $assistant?->getStartMessage(),
+            'type' => $assistant?->getType()?->value,
         ]);
     }
 }

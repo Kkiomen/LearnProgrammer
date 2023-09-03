@@ -24,6 +24,7 @@ return new class extends Migration
             $table->enum('type', AssistantType::toArray())->default(AssistantType::BASIC->value);
             $table->boolean('public')->default(true);
             $table->text('memory_collection')->nullable();
+            $table->text('start_message')->nullable();
             $table->timestamps();
         });
     }

@@ -17,6 +17,7 @@ class DatabaseSeeder extends Seeder
 
         $this->call(UserSeeder::class);
         $this->call(AssistantSeeder::class);
+        $this->call(LongTermMemorySeeder::class);
 
         Avatar::create([
             'img' => null,

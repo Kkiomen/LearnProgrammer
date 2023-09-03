@@ -17,6 +17,8 @@ class AssistantDTO extends Dto implements AssistantInterface
     private ?AssistantType $type;
     private ?bool $public;
 
+    private ?string $startMessage;
+
     private ?string $memoryCollection;
 
     public function getImgUrl(): ?string
@@ -109,5 +111,15 @@ class AssistantDTO extends Dto implements AssistantInterface
         return $this;
     }
 
+    public function getStartMessage(): ?string
+    {
+        return $this->startMessage;
+    }
+
+    public function setStartMessage(?string $startMessage): self
+    {
+        $this->startMessage = $startMessage;
+        return $this;
+    }
 
 }

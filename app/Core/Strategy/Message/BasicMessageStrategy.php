@@ -33,6 +33,7 @@ class BasicMessageStrategy extends MessageStrategy
          */
         $longTermMemoryQdrant = app(LongTermMemoryQdrant::class);
         $memory = $longTermMemoryQdrant->getMemory($responseMessageStrategy->getContent(), null, $this->assistantDTO->getMemoryCollection());
+//        dump($responseMessageStrategy->getContent(), null, $this->assistantDTO->getMemoryCollection());
         if($memory !== null){
             $notes = implode('. ', $memory);
             $notePrompt = ' ### Note that the notes are about the user. In addition, use the following notes provided by you in your speech: ' . $notes . ' ### Note that the notes are about the user.';

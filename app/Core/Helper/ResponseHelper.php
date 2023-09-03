@@ -3,10 +3,12 @@
 namespace App\Core\Helper;
 
 use App\Api\OpenAiApi;
+use App\Class\Assistant\Enum\AssistantType;
 use App\Class\Message\Interface\MessageInterface;
 use App\Core\Class\Response\ResponseDTO;
 use App\Core\Strategy\Message\Response\ResponseMessageStrategy;
 use App\Enum\OpenAiModel;
+use App\Jobs\ComplaintGenerate;
 use App\Services\MessageService;
 use Illuminate\Http\JsonResponse;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -33,11 +35,12 @@ final class ResponseHelper
 
     public function responseStream(ResponseDTO $response): StreamedResponse
     {
-        $prompt = $response->getResponseMessageStrategy()->getPrompt()->getPrompt();
+        $prompt = (empty($response->getMessageDTO()->getContentFromEvent())) ? $response->getResponseMessageStrategy()->getPrompt()->getPrompt() : $response->getMessageDTO()->getContentFromEvent();;
         $systemPrompt = $response->getResponseMessageStrategy()->getPrompt()->getSystem();
         $messageDTO = $response->getMessageDTO();
+        $assistantType = $response->getResponseMessageStrategy()->getType();
 
-        return response()->stream(function () use ($prompt, $systemPrompt, $messageDTO) {
+        return response()->stream(function () use ($prompt, $systemPrompt, $messageDTO, $assistantType) {
             header('Content-Type: text/event-stream');
             header('Cache-Control: no-cache');
             header('Connection: keep-alive');
@@ -52,6 +55,12 @@ final class ResponseHelper
                 $this->sendSseMessage($message, 'message');
             }
             $this->messageService->updateResultOpenAi($messageDTO, $result);
+
+            if($assistantType == AssistantType::COMPLAINT){
+                if(str_contains($result, 'PODSUMOWANIE')){
+                    ComplaintGenerate::dispatch($result);
+                }
+            }
         });
     }
 

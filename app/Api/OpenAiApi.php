@@ -1,23 +1,12 @@
 <?php
 
 namespace App\Api;
-use App\Class\Conversation\Repository\ConversationRepository;
 use App\Class\Message\Interface\MessageInterface;
 use App\Class\Message\Repository\MessageRepository;
 use App\Class\OpenAiMessage;
 use App\Enum\OpenAiModel;
-use App\Helpers\ApiHelper;
-use App\Helpers\MessageHelper;
 use App\Helpers\TokenHelper;
-use App\Models\Avatar;
-use App\Models\Group;
-use App\Models\GroupUser;
-use App\Models\Message;
 use App\Models\TokenUsage;
-use App\Models\User;
-use App\Services\ChatService;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Crypt;
 use OpenAI\Client;
 
 class OpenAiApi
@@ -101,7 +90,7 @@ class OpenAiApi
             $messagesFormatted[] = ['role' => 'system', 'content' => $systemPrompt];
         }
 
-        $messagesFormatted[] = ['role' => 'user', 'content' => $prompt];
+
 
         if($messageDTO !== null){
             /**
@@ -113,9 +102,16 @@ class OpenAiApi
              * @var MessageInterface $message
              */
             foreach ($messages as $message) {
-                $messagesFormatted[] = ['role' => 'user', 'content' => $message->getContent() ?? ''];
-                $messagesFormatted[] = ['role' => 'assistant', 'content' => $message->getResult() ?? ''];
+                if(!empty($message->getContent())){
+                    $messagesFormatted[] = ['role' => 'user', 'content' => $message->getContent() ?? ''];
+                }
+
+                if(!empty($message->getResult())){
+                    $messagesFormatted[] = ['role' => 'assistant', 'content' => $message->getResult() ?? ''];
+                }
             }
+        }else{
+            $messagesFormatted[] = ['role' => 'user', 'content' => $prompt];
         }
 
 
@@ -148,7 +144,7 @@ class OpenAiApi
         $messagesFormatted[] = ['role' => 'user', 'content' => $message];
 
         $defaultParams = [
-            'model' => OpenAiModel::CHAT_GPT_3,
+            'model' => OpenAiModel::GPT_4,
             'messages' => $messagesFormatted
         ];
 

@@ -18,7 +18,6 @@ class MessageController
     public function __construct(
         private MessageFacade $messageFacade,
         private readonly ResponseHelper $responseHelper,
-        private readonly MessageService $messageService,
         private readonly ConversationService $conversationService,
     ) {
     }

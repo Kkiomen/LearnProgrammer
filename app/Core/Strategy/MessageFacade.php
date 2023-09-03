@@ -8,7 +8,9 @@ use App\Class\Assistant\Repository\AssistantRepository;
 use App\Core\Class\Request\Factory\RequestDTOFactory;
 use App\Core\Class\Request\RequestDTO;
 use App\Core\Class\Response\ResponseDTO;
+use App\Core\Dto\EventData;
 use App\Core\Enum\ResponseType;
+use App\Core\Event\EventHandler;
 use App\Core\Helper\ResponseHelper;
 use App\Core\Strategy\Message\BasicMessageStrategy;
 use App\Core\Strategy\Message\ComplaintMessageStrategy;
@@ -27,19 +29,30 @@ class MessageFacade
         private readonly MessageStrategyContext $messageStrategyContext,
         private readonly AssistantRepository $assistantRepository,
         private readonly ResponseHelper $responseHelper,
-        private readonly MessageService $messageService
+        private readonly MessageService $messageService,
+        private readonly EventHandler $eventHandler,
     ) {
     }
 
     public function processAndReturnResponse(): JsonResponse|StreamedResponse
     {
-
-        $message = $this->messageService->createMessageFromRequestDto($this->requestDto);
-
         /**
          * @var AssistantDTO $assistant
          */
         $assistant = $this->assistantRepository->getAssistantById($this->requestDto->getAssistantId());
+        $message = $this->messageService->createMessageFromRequestDto($this->requestDto);
+
+        /**
+         * Handle Event
+         */
+        $event = $this->eventHandler->flush((new EventData())
+            ->setContent($message->getContent())
+            ->setAssistantId($this->requestDto->getAssistantId()));
+        if($event->isChangedContent()){
+            $message->setContentFromEvent($event->getContent());
+        }
+
+
         if ($assistant->getType() === AssistantType::BASIC) {
             $this->messageStrategyContext->setStrategy(new BasicMessageStrategy($this->requestDto));
         } else {
@@ -49,7 +62,8 @@ class MessageFacade
         }
 
         $responseMessageStrategy = $this->messageStrategyContext->handle();
-        $message->setLinks(implode(';', $responseMessageStrategy->getLinks()));
+        $responseMessageStrategy->setType($assistant->getType());
+        $message->setLinks(implode(';', $responseMessageStrategy->getLinks() ?? []));
 
         //Update information about Prompt
         $this->messageService->updatePromptHistory($message, $responseMessageStrategy->getPrompt());

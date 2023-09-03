@@ -32,7 +32,8 @@ class LongTermMemoryQdrant
     public function save(string $content, ?Message $message = null, string $nameCollection = 'memory'): bool
     {
         $content = $this->getContentFromMessage($content, $message);
-        $tags = $this->openAiApi->makeTags($content);
+//        $tags = $this->openAiApi->makeTags($content);
+        $tags = null;
         $longTerm = $this->createLongTermMemory($this->getIdFromMessage($message), $content, $tags);
 
         if ($this->qdrant->addVector(
@@ -42,7 +43,7 @@ class LongTermMemoryQdrant
                     openAiApi: $this->openAiApi,
                     text: $longTerm->content,
                     payload: [
-                        'indetificator' => $longTerm->id,
+                        'id' => $longTerm->id,
                         'message' => $longTerm->content
                         ]
                 ),
@@ -120,7 +121,7 @@ class LongTermMemoryQdrant
 
         $result = [];
         foreach ($matches as $match) {
-            if ($match['score'] > 0.79) {
+            if ($match['score'] > 0.85) {
                 $longTerm = LongTermMemoryContent::where('id', $match['id'])->first();
                 if($longTerm && !empty($longTerm->link)){
                     $result[] = $longTerm->link;
@@ -145,12 +146,12 @@ class LongTermMemoryQdrant
     /**
      * Creates a new long-term memory content record in the database.
      *
-     * @param int $id The ID of the message associated with the long-term memory content.
-     * @param string $content The content of the long-term memory.
-     * @param string $tags The tags associated with the long-term memory.
+     * @param  int  $id  The ID of the message associated with the long-term memory content.
+     * @param  string  $content  The content of the long-term memory.
+     * @param  string|null  $tags  The tags associated with the long-term memory.
      * @return LongTermMemoryContent The created long-term memory content record.
      */
-    private function createLongTermMemory(int $id, string $content, string $tags): LongTermMemoryContent
+    private function createLongTermMemory(int $id, string $content, ?string $tags = null): LongTermMemoryContent
     {
         $longTerm = new LongTermMemoryContent();
         $longTerm->message_id = $id;

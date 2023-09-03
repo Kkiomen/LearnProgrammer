@@ -6,13 +6,13 @@ import Snippets from "./utils/Snippets.jsx";
 import axiosClient from "../axios-client.js";
 import {generateUniqueId} from "../functions/Helpers.js";
 import {useCookies} from "react-cookie";
+import {toast} from 'react-toastify';
 
-export default function AssistantChat() {
+export default function AssistantChat({navigation}) {
   const {assistantId} = useParams();
   const chatRef = useRef();
   const [messages, setMessages] = useState([]);
   const LIMIT_MESSAGE = 8192;
-  const navigate = useNavigate();
   const [assistant, setAssistant] = useState([]);
   const [canSendMessage, setCanSendMessage] = useState(true);
   const [message, setMessage] = useState("");
@@ -23,7 +23,7 @@ export default function AssistantChat() {
     getAssistant();
     generateNewHash();
     getMessagesConversation();
-  }, []);
+  }, [assistantId]);
 
   const generateNewHash = () => {
     if(cookies["sessionHash_" + assistantId] === undefined) {
@@ -44,6 +44,14 @@ export default function AssistantChat() {
   const getAssistant = () => {
     axiosClient.get(`/assistant/` + assistantId)
       .then(({data}) => {
+        if(data.name === null){
+          toast('Not found this assistant', {
+            position: "top-right",
+            theme: "dark",
+            draggable: true,
+          });
+
+        }
         setAssistant(data);
       })
   }
@@ -88,9 +96,21 @@ export default function AssistantChat() {
               loaded: true,
             }
           ]));
-
-
         });
+
+        if (data.length === 0 && assistant.start_message !== null) {
+          setMessages(prevMessages => prevMessages.concat([
+            {
+              sender: "ai",
+              message: {original: assistant.start_message},
+              links: message.links,
+              id: generateUniqueId(messages),
+              translated: false,
+              loaded: true,
+            }
+          ]));
+        }
+
       })
   }
 
@@ -352,7 +372,7 @@ export default function AssistantChat() {
             onKeyDown={handleKeyDown}
             onPaste={handlePaste}
           ></textarea>
-          <div className="flex justify-between py-1 mb-5">
+          <div className="flex justify-between py-1 mb-5 text-white">
             <div
               onClick={clearConversation}
               className="cursor-pointer hover:underline select-none">

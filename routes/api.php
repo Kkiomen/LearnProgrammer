@@ -1,16 +1,17 @@
 <?php
 
 use App\Http\Controllers\Api\AuthController;
-use App\Http\Controllers\Api\MessageController;
-use App\Http\Controllers\Api\UserController;
-use App\Http\Controllers\Api\ChatController;
-use App\Http\Controllers\Api\ProductDescriptionController;
-use App\Http\Controllers\Api\SnippetController;
-use App\Http\Controllers\Api\GroupController;
 use App\Http\Controllers\Api\AvatarController;
+use App\Http\Controllers\Api\ChatController;
 use App\Http\Controllers\Api\CloudController;
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\GroupController;
+use App\Http\Controllers\Api\MessageController;
+use App\Http\Controllers\Api\ProductDescriptionController;
 use App\Http\Controllers\Api\SessionController;
+use App\Http\Controllers\Api\SnippetController;
+use App\Http\Controllers\Api\UserController;
+use Illuminate\Support\Facades\Route;
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -21,6 +22,9 @@ use App\Http\Controllers\Api\SessionController;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
+Route::get('/quiz/design-pattern/question', [\App\Http\Controllers\Api\QuizDesignPatternController::class, 'getNewQuestion']);
+
+
 Route::post('/message/new', [MessageController::class, 'newMessage']);
 Route::post('/messages', [MessageController::class, 'getMessagesConversation']);
 Route::post('/messages/clear', [MessageController::class, 'clearConversation']);

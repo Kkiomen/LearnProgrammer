@@ -1194,3 +1194,119 @@
     color: #f9be2f;
     font-weight: 700;
 }
+
+
+pre code.hljs {
+    display: block;
+    overflow-x: auto;
+    padding: 1em
+}
+
+code.hljs {
+    padding: 3px 5px
+}
+
+.hljs {
+    color: #b0b3b9;
+    background: #202226;
+    font-family: JetBrains Mono,monospace
+}
+
+.hljs-comment {
+    color: #697070
+}
+
+.hljs-punctuation,.hljs-tag {
+    color: #444a
+}
+
+.hljs-tag .hljs-attr,.hljs-tag .hljs-name {
+    color: #444
+}
+
+.hljs-attribute,.hljs-doctag,.hljs-keyword,.hljs-meta .hljs-keyword,.hljs-name,.hljs-selector-tag {
+    font-weight: 700;
+    color: #d88f72;
+}
+
+.hljs-deletion,.hljs-number,.hljs-quote,.hljs-selector-class,.hljs-selector-id,.hljs-string,.hljs-template-tag,.hljs-type {
+    color: #d7deec
+}
+
+.hljs-section,.hljs-title {
+    color: #61aeee;
+    font-weight: 700
+}
+
+.hljs-link,.hljs-operator,.hljs-regexp,.hljs-selector-attr,.hljs-selector-pseudo,.hljs-symbol,.hljs-template-variable,.hljs-variable {
+    color: #9679a5
+}
+
+.hljs-literal {
+    color: #56b6c2
+}
+
+.hljs-addition,.hljs-built_in,.hljs-bullet,.hljs-code {
+    color: #397300
+}
+
+.hljs-meta {
+    color: #1f7199
+}
+
+.hljs-meta .hljs-string {
+    color: #38a
+}
+
+.hljs-emphasis {
+    font-style: italic
+}
+
+.hljs-strong {
+    font-weight: 700
+}
+
+.hljs-comment,.hljs-quote {
+    color: #5c6370;
+    font-style: italic
+}
+
+.hljs-doctag,.hljs-keyword,.hljs-formula {
+    color: #d88f72
+}
+
+.hljs-section,.hljs-name,.hljs-selector-tag,.hljs-deletion,.hljs-subst {
+    color: #e06c75
+}
+
+.hljs-literal {
+    color: #56b6c2
+}
+
+.hljs-string,.hljs-regexp,.hljs-addition,.hljs-attribute,.hljs-meta .hljs-string {
+    color: #98c379
+}
+
+.hljs-attr,.hljs-variable,.hljs-template-variable,.hljs-type,.hljs-selector-class,.hljs-selector-attr,.hljs-selector-pseudo,.hljs-number {
+    color: #9679a5
+}
+
+.hljs-symbol,.hljs-bullet,.hljs-link,.hljs-meta,.hljs-selector-id,.hljs-title {
+    color: #61aeee
+}
+
+.hljs-built_in,.hljs-title.class_,.hljs-class .hljs-title {
+    color: #aeb1b6
+}
+
+.explanation h4{
+    margin-top: 1.8rem;
+    margin-bottom: 0.8rem;
+    font-weight: 500;
+    font-size: calc(1.305rem + .33vw);
+}
+
+.explanation p {
+    margin-top: 0;
+    margin-bottom: 1.2rem;
+}

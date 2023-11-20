@@ -5,7 +5,7 @@ services:
             context: ./vendor/laravel/sail/runtimes/8.2
             dockerfile: Dockerfile
             args:
-                WWWGROUP: '${WWWGROUP}'
+                WWWGROUP: '${WWWGROUP:-1000}'
         image: sail-8.2/app
         extra_hosts:
             - 'host.docker.internal:host-gateway'
@@ -22,9 +22,9 @@ services:
         networks:
             - sail
         depends_on:
-            - mysql
+            - mysql_learn_programmer
             - qdrant
-    mysql:
+    mysql_learn_programmer:
         image: 'mysql/mysql-server:8.0'
         ports:
             - '${FORWARD_DB_PORT:-3355}:3306'
@@ -40,20 +40,25 @@ services:
             - './vendor/laravel/sail/database/mysql/create-testing-database.sh:/docker-entrypoint-initdb.d/10-create-testing-database.sh'
         networks:
             - sail
+        restart: on-failure
         healthcheck:
-            test:
-                - CMD
-                - mysqladmin
-                - ping
-                - '-p${DB_PASSWORD}'
-            retries: 3
+            test: [ 'CMD', 'mysqladmin', 'ping', '-p${DB_PASSWORD}' ]
+            interval: 10s
             timeout: 5s
+            retries: 3
     qdrant:
         image: 'qdrant/qdrant:latest'
         ports:
             - '6333:6333'
         volumes:
             - 'qdrant-storage:/qdrant/storage'
+        networks:
+            - sail
+    adminer:
+        image: adminer
+        restart: always
+        ports:
+            - 8080:8080
         networks:
             - sail
 networks:

@@ -10,6 +10,7 @@ import MainLayout from "./components/MainLayout.jsx";
 import Index from "./views/Index.jsx";
 import MainAppLayout from "./components/MainAppLayout.jsx";
 import AssistantChat from "./components/AssistantChat.jsx";
+import QuizDesignPattern from "./views/QuizDesignPattern.jsx";
 
 const router = createBrowserRouter([
   {
@@ -116,6 +117,10 @@ const router = createBrowserRouter([
       {
         path: '/login',
         element: <Login/>
+      },
+      {
+        path: '/quiz',
+        element: <QuizDesignPattern/>
       },
       {
         path: '/signup',

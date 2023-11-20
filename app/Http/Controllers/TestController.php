@@ -6,44 +6,126 @@ use App\Api\OpenAiApi;
 use App\Api\Qdrant\Qdrant;
 use App\Api\Qdrant\Search\SearchRequest;
 use App\Api\Qdrant\Vector\VectorText;
-use App\Class\Conversation\Repository\ConversationRepository;
 use App\Class\LongTermMemory;
 use App\Class\LongTermMemoryQdrant;
+use App\Enum\QuizType;
 use App\Jobs\ComplaintGenerate;
-use App\Strategy\Message\MessageContext;
-use Cscheide\ArticleExtractor\ArticleExtractor;
+use App\Models\QuizQuestion;
+use App\Prompts\ComplaintPromptHelper;
+use App\Prompts\GenerateQuestionToQuizPromptHelper;
 use Illuminate\Http\Request;
 use OpenAI\Client;
+use Illuminate\Support\Facades\File;
 
 class TestController
 {
-    private Client|null $client = null;
-    private LongTermMemoryQdrant $longTermMemory;
-    private OpenAiApi $openAiApi;
-    private Qdrant $qdrant;
+//    private Client|null $client = null;
+//    private LongTermMemoryQdrant $longTermMemory;
+//    private OpenAiApi $openAiApi;
+//    private Qdrant $qdrant;
+//
+//    public function __construct(LongTermMemoryQdrant $longTermMemory, Qdrant $qdrant, OpenAiApi $openAiApi)
+//    {
+//        $this->client = $this->getClient();
+//        $this->longTermMemory = $longTermMemory;
+//        $this->qdrant = $qdrant;
+//        $this->openAiApi = $openAiApi;
+//    }
 
-    public function __construct(LongTermMemoryQdrant $longTermMemory, Qdrant $qdrant, OpenAiApi $openAiApi)
+    public function test(Request $request)
     {
-        $this->client = $this->getClient();
-        $this->longTermMemory = $longTermMemory;
-        $this->qdrant = $qdrant;
-        $this->openAiApi = $openAiApi;
-    }
 
-    public function test(Request $request, MessageContext $messageContext)
-    {
+        $handmade = false;
+
+        $errors = [];
+        $success = 0;
+        $failed = 0;
+
+        for($i = 0; $i <= 30; $i++){
+            try{
+                $designPatterns = GenerateQuestionToQuizPromptHelper::getDesignPatterns();
+                $randomIndex = array_rand($designPatterns);
+                $chooseDesignPattern = $designPatterns[$randomIndex];
+
+                $listCurrentQuiz = [];
+                $savedQuizWithThisPattern = QuizQuestion::where('correct_answer', $chooseDesignPattern)->get();
+
+                foreach ($savedQuizWithThisPattern as $quiz){
+                    $listCurrentQuiz[] = substr($quiz->question, 0, 30);;
+                }
+
+                $prompt = GenerateQuestionToQuizPromptHelper::getPrompt($chooseDesignPattern, $listCurrentQuiz);
+
+                if($handmade){
+                    echo $prompt;
+                    dd($prompt, GenerateQuestionToQuizPromptHelper::generateOptions($chooseDesignPattern), $chooseDesignPattern);
+                }else{
+
+                    /** @var OpenAiApi $openAiApi */
+                    $openAiApi = app(OpenAiApi::class);
+                    $json = $openAiApi->completionChat($prompt);
+                    echo $json;
+                    $json = GenerateQuestionToQuizPromptHelper::stripJsonMarkdown($json);
+
+                    $quizJson = json_decode($json, true);
+
+
+                    if (json_last_error() !== JSON_ERROR_NONE) {
+                        throw new \Exception(json_last_error_msg() . ' ' . $json);
+                    }
+
+                    if ($quizJson === null) {
+                        throw new \Exception('Zawartość JSON jest pusta lub nieprawidłowa');
+                    }
+
+
+                    $quizJson['options'] = GenerateQuestionToQuizPromptHelper::generateOptions($chooseDesignPattern);
+                    $quizJson['correctAnswer'] = $chooseDesignPattern;
+
+                    $quiz = new QuizQuestion();
+                    $quiz->type = QuizType::DESIGN_PATTERN->value;
+                    $quiz->lang = 'pl';
+                    $quiz->question = $quizJson['question'];
+                    $quiz->options = $quizJson['options'];
+                    $quiz->correct_answer = $quizJson['correctAnswer'];
+                    $quiz->explanation = $quizJson['explanation'];
+
+                    $quiz->save();
+                    $success++;
+                }
+
+            }catch (\Exception $e){
+                $errors[] = $e->getMessage();
+                $quiz = new QuizQuestion();
+                $failed ++;
+            }
+        }
+
+
+        echo '<h1>' . $success .' / ' . $failed . '</h1>';
+        dd($errors, $quiz);
+
+
+
+
+
+
+
+
+
+
 //        /**
 //         * @var ConversationRepository $convRepo
 //         */
 //        $convRepo = app(ConversationRepository::class);
 //
 //        dump($convRepo->getMessagesBySessionHash('d1ce2a50-24a3-44f4-9b30-0aec2878600f'));
-
-        ComplaintGenerate::dispatch('[SUMMARY]:
-Przedmiot reklamacji: Słuchawki Airpods Pro
-Opis reklamacji: Słuchawki nie ładują się pomimo działającego kabla ładowania. Słuchawki nie reagują na ładowanie, jednak kabel ładowania działa poprawnie na innych urządzeniach.
-Przewidywany czas rozpatrzenia reklamacji: Do 3 tygodni od momentu zgłoszenia reklamacji.
-Wynik reklamacji: Wymiana na nowy egzemplarz słuchawek Airpods Pro.');
+//
+//        ComplaintGenerate::dispatch('[SUMMARY]:
+//Przedmiot reklamacji: Słuchawki Airpods Pro
+//Opis reklamacji: Słuchawki nie ładują się pomimo działającego kabla ładowania. Słuchawki nie reagują na ładowanie, jednak kabel ładowania działa poprawnie na innych urządzeniach.
+//Przewidywany czas rozpatrzenia reklamacji: Do 3 tygodni od momentu zgłoszenia reklamacji.
+//Wynik reklamacji: Wymiana na nowy egzemplarz słuchawek Airpods Pro.');
 
 
 //        foreach ($this->openAiApi->getModels()['data'] as $model){

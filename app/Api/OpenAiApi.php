@@ -132,7 +132,7 @@ class OpenAiApi
         return $this->completionChat($conversation, $systemPrompt);
     }
 
-    public function completionChat($message, $systemPrompt, $settings = null): string
+    public function completionChat($message, $systemPrompt = null, $settings = null): string
     {
         if(is_null($settings)){
             $settings = [
@@ -140,11 +140,14 @@ class OpenAiApi
             ];
         }
 
-        $messagesFormatted[] = ['role' => 'system', 'content' => $systemPrompt];
+        if($systemPrompt !== null){
+            $messagesFormatted[] = ['role' => 'system', 'content' => $systemPrompt];
+        }
+
         $messagesFormatted[] = ['role' => 'user', 'content' => $message];
 
         $defaultParams = [
-            'model' => OpenAiModel::GPT_4,
+            'model' => OpenAiModel::CHAT_GPT_3,
             'messages' => $messagesFormatted
         ];
 

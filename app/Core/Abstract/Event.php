@@ -2,8 +2,8 @@
 
 namespace App\Core\Abstract;
 
-use App\Core\Dto\EventData;
-use App\Core\Dto\EventResponseDto;
+use App\Core\Core\Dto\EventData;
+use App\Core\Core\Dto\EventResponseDto;
 
 abstract class Event
 {

@@ -3,8 +3,8 @@
 namespace App\Core\Abstract;
 
 use App\Api\OpenAiApi;
-use App\Core\Dto\EventData;
-use App\Core\Dto\EventResponseDto;
+use App\Core\Core\Dto\EventData;
+use App\Core\Core\Dto\EventResponseDto;
 use App\Enum\OpenAiModel;
 use App\Prompts\EventPromptHelper;
 

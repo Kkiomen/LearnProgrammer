@@ -11,6 +11,8 @@ class ResponseDTO
     private ResponseMessageStrategy $responseMessageStrategy;
     private MessageInterface $messageDTO;
 
+    private float $temperature;
+
     public function getResponseMessageStrategy(): ResponseMessageStrategy
     {
         return $this->responseMessageStrategy;
@@ -33,5 +35,16 @@ class ResponseDTO
         return $this;
     }
 
+    public function getTemperature(): float
+    {
+        return $this->temperature;
+    }
+
+    public function setTemperature(float $temperature): self
+    {
+        $this->temperature = $temperature;
+
+        return $this;
+    }
 
 }

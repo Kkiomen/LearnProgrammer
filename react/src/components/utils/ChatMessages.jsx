@@ -57,7 +57,7 @@ export default function ChatMessages({messages, regenerate, assistant}) {
                 {
                   isAi ? (
                     <div className="flex justify-between">
-                      <img src={assistant.img !== "null"  ? assistant.img : `/img/${assistant.short_name}.jpg`}
+                      <img src={`https://i.imgur.com/ucLm6ji.jpg`}
                            className="rounded-xl w-24 ml-8 bg-ai-conversation-page p-0.5" style={{marginTop: -1.5 + 'em'}}/>
 
                       <div className="mt-2 items-center flex gap-3  mr-3">

@@ -42,7 +42,7 @@ class MessageService
         return $this->createMessage(
             conversationId: $conversation->getId(),
             content: $requestDTO->getMessage(),
-            senderClass: User::class
+            senderClass: 'USER'
         );
     }
 
@@ -130,9 +130,9 @@ class MessageService
     {
         if($assistant->getStartMessage() !== null){
             $this->createMessage(
-                conversationId: $conversation->getId(),
-                content: $assistant->getStartMessage(),
-                senderId: $assistant->getId(),
+                conversationId: 1,
+                content: 'Co cię interesuje?',
+                senderId: 1,
                 senderClass: AssistantInterface::class
             );
         }

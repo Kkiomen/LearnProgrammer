@@ -11,6 +11,7 @@ import Index from "./views/Index.jsx";
 import MainAppLayout from "./components/MainAppLayout.jsx";
 import AssistantChat from "./components/AssistantChat.jsx";
 import QuizDesignPattern from "./views/QuizDesignPattern.jsx";
+import ChatGPT from "./views/ChatGPT.jsx";
 
 const router = createBrowserRouter([
   {
@@ -125,6 +126,10 @@ const router = createBrowserRouter([
       {
         path: '/signup',
         element: <Signup/>
+      },
+      {
+        path: '/chatgpt-unique-4',
+        element: <ChatGPT/>
       }
     ]
   },

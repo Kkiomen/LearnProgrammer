@@ -51,13 +51,16 @@ final readonly class ResponseHelper
         $systemPrompt = $response->getResponseMessageStrategy()->getPrompt()->getSystem();
         $messageDTO = $response->getMessageDTO();
         $assistantType = $response->getResponseMessageStrategy()->getType();
+        $temperature = $response->getTemperature();
 
-        return response()->stream(function () use ($prompt, $systemPrompt, $messageDTO, $assistantType) {
+        return response()->stream(function () use ($prompt, $systemPrompt, $messageDTO, $assistantType, $temperature) {
             header('Content-Type: text/event-stream');
             header('Cache-Control: no-cache');
             header('Connection: keep-alive');
 
-            $stream = $this->openAiApi->chat($prompt, OpenAiModel::CHAT_GPT_3, $systemPrompt, null, $messageDTO);
+            $stream = $this->openAiApi->chat($prompt, OpenAiModel::GPT_4, $systemPrompt, [
+                'temperature' => $temperature
+            ], $messageDTO);
             $result = '';
             foreach ($stream as $response) {
                 $message = $response->choices[0]->toArray();

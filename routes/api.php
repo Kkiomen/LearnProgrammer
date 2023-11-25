@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\AvatarController;
 use App\Http\Controllers\Api\ChatController;
 use App\Http\Controllers\Api\CloudController;
+use App\Http\Controllers\Api\Erp\AssistantMessageController;
 use App\Http\Controllers\Api\GroupController;
 use App\Http\Controllers\Api\MessageController;
 use App\Http\Controllers\Api\ProductDescriptionController;
@@ -23,6 +24,9 @@ use Illuminate\Support\Facades\Route;
 |
 */
 Route::get('/quiz/design-pattern/question', [\App\Http\Controllers\Api\QuizDesignPatternController::class, 'getNewQuestion']);
+
+Route::post('/erp/message/new', [AssistantMessageController::class, 'newMessage']);
+
 
 
 Route::post('/message/new', [MessageController::class, 'newMessage']);

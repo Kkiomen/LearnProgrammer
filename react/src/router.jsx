@@ -12,6 +12,8 @@ import MainAppLayout from "./components/MainAppLayout.jsx";
 import AssistantChat from "./components/AssistantChat.jsx";
 import QuizDesignPattern from "./views/QuizDesignPattern.jsx";
 import ChatGPT from "./views/ChatGPT.jsx";
+import ErpAiAssistant from "./ErpAiAssistant/pages/ErpAiAssistant.jsx";
+import React from "react";
 
 const router = createBrowserRouter([
   {
@@ -130,6 +132,10 @@ const router = createBrowserRouter([
       {
         path: '/chatgpt-unique-4',
         element: <ChatGPT/>
+      },
+      {
+        path: '/erp-assistant',
+        element: <ErpAiAssistant/>
       }
     ]
   },

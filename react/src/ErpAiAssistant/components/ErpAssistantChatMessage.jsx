@@ -20,7 +20,6 @@ export default function ErpAssistantChatMessage(messageConversation) {
                 )
               }
 
-
             </div>
             <div className={`${isAi ? 'ml-3' : ''}`}>
 
@@ -36,7 +35,6 @@ export default function ErpAssistantChatMessage(messageConversation) {
                   <label htmlFor="large-input" className="block mb-2 text-sm font-medium text-gray-500 dark:text-white">Your Question</label>
                 </div>
                 )}
-
 
             </div>
           </div>

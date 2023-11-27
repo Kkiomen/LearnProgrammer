@@ -35,6 +35,8 @@ export default function ErpAiAssistant() {
       id: generateUniqueId(messages),
       translated: false,
       loaded: false,
+      step: [],
+      table: [],
     };
     setMessages((messages) => [...messages, newMessage]);
     await generateResponseAi(aiMessage, message);
@@ -85,7 +87,7 @@ export default function ErpAiAssistant() {
           setMessages((messages) =>
             messages.map((m) =>
               m.id === aiMessage.id
-                ? {...m, message: {original: m.message.original + data.delta.content}, loaded: true}
+                ? {...m, message: {original: m.message.original + data.delta.content}, loaded: true, steps: data.steps, table: data.table}
                 : m
             )
           );

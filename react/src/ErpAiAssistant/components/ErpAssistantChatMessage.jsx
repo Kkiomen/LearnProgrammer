@@ -4,11 +4,18 @@ import rehypeHighlight from "rehype-highlight";
 import rehypePrism from "rehype-prism";
 import rehypeRaw from "rehype-raw";
 import ReactMarkdown from "react-markdown";
+import ErpAssistantChatMessageSteps from "./ErpAssistantChatMessageSteps.jsx";
+import ErpAssistantChatMessageTable from "./ErpAssistantChatMessageTable.jsx";
 
 export default function ErpAssistantChatMessage(messageConversation) {
   const isAi = messageConversation.isAi;
 
+  const { steps } = messageConversation.message;
+
+
   if (messageConversation && messageConversation.message && messageConversation.message.original !== null) {
+
+    // console.log(steps);
     return (
       <div
         className="max-w-[min(60em,98vw)] bg-white border shadow-lg mx-auto md:py-10 py-[4em] grid lg:grid-cols-[2em,4em,1fr,4em,2em] md:grid-cols-[2em,2vw,1fr,2vw,2em] grid-cols-[3vw,3vw,1fr,3vw,3vw] text-sm md:text-base lg:text-lg mt-5">
@@ -46,6 +53,10 @@ export default function ErpAssistantChatMessage(messageConversation) {
               children={messageConversation.message.loaded ? messageConversation.message.message.original : '<div className="ml-8 dot-flashing text-white"/>'}
             />
           </div>
+
+          <ErpAssistantChatMessageTable messageConversation={messageConversation} />
+
+          <ErpAssistantChatMessageSteps messageConversation={messageConversation} />
 
         </div>
       </div>

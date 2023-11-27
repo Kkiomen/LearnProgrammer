@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Prompts;
+namespace App\CoreErpAssistant\Prompts;
 
-class EventPromptHelper
+class ChooseEventPromptHelper
 {
-    public static function chooseEventFromContent(string $listEvents): string
+    public static function getPrompt(string $listEvents): string
     {
         return '
             Prompt Event:

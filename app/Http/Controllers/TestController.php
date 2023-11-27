@@ -2,18 +2,25 @@
 
 namespace App\Http\Controllers;
 
-use App\Api\OpenAiApi;
 use App\Api\Qdrant\Qdrant;
 use App\Api\Qdrant\Search\SearchRequest;
 use App\Api\Qdrant\Vector\VectorText;
 use App\Class\LongTermMemory;
 use App\Class\LongTermMemoryQdrant;
+use App\CoreErpAssistant\Api\OpenAiApi;
+use App\CoreErpAssistant\Dto\MessageProcessor\MessageProcessor;
+use App\CoreErpAssistant\Enum\OpenAiModel;
+use App\CoreErpAssistant\Prompts\CreateHeaderTablePrompt;
+use App\CoreErpAssistant\Service\Interfaces\MessageFacadeInterface;
+use App\CoreErpAssistant\Service\Message\MessageFacade;
 use App\Enum\QuizType;
 use App\Jobs\ComplaintGenerate;
 use App\Models\QuizQuestion;
 use App\Prompts\ComplaintPromptHelper;
 use App\Prompts\GenerateQuestionToQuizPromptHelper;
+use App\Prompts\SelectOrderPrompt;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use OpenAI\Client;
 use Illuminate\Support\Facades\File;
 
@@ -32,79 +39,130 @@ class TestController
 //        $this->openAiApi = $openAiApi;
 //    }
 
+    public function __construct(
+        private readonly MessageFacade $messageFacade,
+        private readonly OpenAiApi $openAiApi,
+    )
+    {
+    }
+
     public function test(Request $request)
     {
+//        $messageProcessor = new MessageProcessor();
+//        $messageProcessor->setMessageFromUser('Czy dzisiaj cokolwiek zakupiła u nas Chmielewska?');
+//
+//        $this->messageFacade->loadMessageProcessor($messageProcessor);
+//
+//        $this->messageFacade->processAndReturnResponse();
 
-        $handmade = false;
+//        $system = SelectOrderPrompt::getPrompt();
+//        $message = 'Ile klient "RAWPOL" wydał w tym roku?';
+        $sql = "SELECT id, company_address
+FROM combo_orders
+ORDER BY created_at DESC
+LIMIT 15;";
 
-        $errors = [];
-        $success = 0;
-        $failed = 0;
+        $result = DB::select(DB::raw($sql));
 
-        for($i = 0; $i <= 30; $i++){
-            try{
-                $designPatterns = GenerateQuestionToQuizPromptHelper::getDesignPatterns();
-                $randomIndex = array_rand($designPatterns);
-                $chooseDesignPattern = $designPatterns[$randomIndex];
-
-                $listCurrentQuiz = [];
-                $savedQuizWithThisPattern = QuizQuestion::where('correct_answer', $chooseDesignPattern)->get();
-
-                foreach ($savedQuizWithThisPattern as $quiz){
-                    $listCurrentQuiz[] = substr($quiz->question, 0, 30);;
-                }
-
-                $prompt = GenerateQuestionToQuizPromptHelper::getPrompt($chooseDesignPattern, $listCurrentQuiz);
-
-                if($handmade){
-                    echo $prompt;
-                    dd($prompt, GenerateQuestionToQuizPromptHelper::generateOptions($chooseDesignPattern), $chooseDesignPattern);
-                }else{
-
-                    /** @var OpenAiApi $openAiApi */
-                    $openAiApi = app(OpenAiApi::class);
-                    $json = $openAiApi->completionChat($prompt);
-                    echo $json;
-                    $json = GenerateQuestionToQuizPromptHelper::stripJsonMarkdown($json);
-
-                    $quizJson = json_decode($json, true);
+        $resultJson = json_encode($result);
+        echo $resultJson;
 
 
-                    if (json_last_error() !== JSON_ERROR_NONE) {
-                        throw new \Exception(json_last_error_msg() . ' ' . $json);
-                    }
+        $message = json_encode($result[0]);
+        $system = CreateHeaderTablePrompt::getPrompt($sql);
 
-                    if ($quizJson === null) {
-                        throw new \Exception('Zawartość JSON jest pusta lub nieprawidłowa');
-                    }
+        $header =  $this->openAiApi->completionChat(
+            message: $message,
+            systemPrompt: $system,
+            model: OpenAiModel::CHAT_GPT_3
+        );
 
+        $table = [];
 
-                    $quizJson['options'] = GenerateQuestionToQuizPromptHelper::generateOptions($chooseDesignPattern);
-                    $quizJson['correctAnswer'] = $chooseDesignPattern;
+        $table[] = json_decode($header, true)[0];
+        $table = array_merge($table, $result);
 
-                    $quiz = new QuizQuestion();
-                    $quiz->type = QuizType::DESIGN_PATTERN->value;
-                    $quiz->lang = 'pl';
-                    $quiz->question = $quizJson['question'];
-                    $quiz->options = $quizJson['options'];
-                    $quiz->correct_answer = $quizJson['correctAnswer'];
-                    $quiz->explanation = $quizJson['explanation'];
-
-                    $quiz->save();
-                    $success++;
-                }
-
-            }catch (\Exception $e){
-                $errors[] = $e->getMessage();
-                $quiz = new QuizQuestion();
-                $failed ++;
-            }
-        }
+        dd(json_encode($table));
 
 
-        echo '<h1>' . $success .' / ' . $failed . '</h1>';
-        dd($errors, $quiz);
 
+
+
+
+
+
+
+
+//        $handmade = false;
+//
+//        $errors = [];
+//        $success = 0;
+//        $failed = 0;
+//
+//        for($i = 0; $i <= 30; $i++){
+//            try{
+//                $designPatterns = GenerateQuestionToQuizPromptHelper::getDesignPatterns();
+//                $randomIndex = array_rand($designPatterns);
+//                $chooseDesignPattern = $designPatterns[$randomIndex];
+//
+//                $listCurrentQuiz = [];
+//                $savedQuizWithThisPattern = QuizQuestion::where('correct_answer', $chooseDesignPattern)->get();
+//
+//                foreach ($savedQuizWithThisPattern as $quiz){
+//                    $listCurrentQuiz[] = substr($quiz->question, 0, 30);;
+//                }
+//
+//                $prompt = GenerateQuestionToQuizPromptHelper::getPrompt($chooseDesignPattern, $listCurrentQuiz);
+//
+//                if($handmade){
+//                    echo $prompt;
+//                    dd($prompt, GenerateQuestionToQuizPromptHelper::generateOptions($chooseDesignPattern), $chooseDesignPattern);
+//                }else{
+//
+//                    /** @var OpenAiApi $openAiApi */
+//                    $openAiApi = app(OpenAiApi::class);
+//                    $json = $openAiApi->completionChat($prompt);
+//                    echo $json;
+//                    $json = GenerateQuestionToQuizPromptHelper::stripJsonMarkdown($json);
+//
+//                    $quizJson = json_decode($json, true);
+//
+//
+//                    if (json_last_error() !== JSON_ERROR_NONE) {
+//                        throw new \Exception(json_last_error_msg() . ' ' . $json);
+//                    }
+//
+//                    if ($quizJson === null) {
+//                        throw new \Exception('Zawartość JSON jest pusta lub nieprawidłowa');
+//                    }
+//
+//
+//                    $quizJson['options'] = GenerateQuestionToQuizPromptHelper::generateOptions($chooseDesignPattern);
+//                    $quizJson['correctAnswer'] = $chooseDesignPattern;
+//
+//                    $quiz = new QuizQuestion();
+//                    $quiz->type = QuizType::DESIGN_PATTERN->value;
+//                    $quiz->lang = 'pl';
+//                    $quiz->question = $quizJson['question'];
+//                    $quiz->options = $quizJson['options'];
+//                    $quiz->correct_answer = $quizJson['correctAnswer'];
+//                    $quiz->explanation = $quizJson['explanation'];
+//
+//                    $quiz->save();
+//                    $success++;
+//                }
+//
+//            }catch (\Exception $e){
+//                $errors[] = $e->getMessage();
+//                $quiz = new QuizQuestion();
+//                $failed ++;
+//            }
+//        }
+//
+//
+//        echo '<h1>' . $success .' / ' . $failed . '</h1>';
+//        dd($errors, $quiz);
+//
 
 
 

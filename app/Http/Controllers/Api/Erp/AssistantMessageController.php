@@ -3,14 +3,18 @@
 namespace App\Http\Controllers\Api\Erp;
 
 use App\Api\OpenAiApi;
-use App\Class\Assistant\Enum\AssistantType;
 use App\Core\Class\Request\Factory\RequestDTOFactory;
 use App\Core\Helper\ResponseHelper;
+use App\CoreErpAssistant\Dto\MessageProcessor\LoggerStep\LoggerSteps;
+use App\CoreErpAssistant\Prompts\OrderSQLPrompt;
+use App\CoreErpAssistant\Prompts\ResponseUserPrompt;
+use App\CoreErpAssistant\Service\Interfaces\MessageFacadeInterface;
+use App\CoreErpAssistant\Service\Message\MessageFacade;
 use App\Enum\OpenAiModel;
-use App\Jobs\ComplaintGenerate;
 use App\Services\ConversationService;
 use App\Services\MessageService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class AssistantMessageController
 {
@@ -21,45 +25,75 @@ class AssistantMessageController
         private MessageService $messageService,
         private readonly RequestDTOFactory $requestDTOFactory,
         private OpenAiApi $openAiApi,
+        private readonly MessageFacade $messageFacade,
     ) {
     }
 
     public function newMessage(Request $request)
     {
-//        return response()->json([
-//            'message' => 'Hello World!'
+
+        $this->messageFacade->loadRequest($request);
+        return $this->messageFacade->processAndReturnResponse();
+
+//
+//        $loggerStep = new LoggerSteps();
+//
+//        $prompt = $request->get('message');
+//        $systemPrompt = '';
+//        $temperature = 0.5;
+//
+//        $loggerStep->addStep([
+//            'description' => 'Pobranie prompta z requestu',
+//            'prompt' => $prompt,
+//            'systemPrompt' => $systemPrompt,
+//            'temperature' => $temperature,
 //        ]);
-
-        $prompt = $request->get('message');
-        $systemPrompt = '';
-        $messageDTO = null;
-        $assistantType = null;
-        $temperature = 0.5;
-
-        return response()->stream(function () use ($prompt, $systemPrompt, $messageDTO, $assistantType, $temperature) {
-            header('Content-Type: text/event-stream');
-            header('Cache-Control: no-cache');
-            header('Connection: keep-alive');
-
-            $stream = $this->openAiApi->chat($prompt, OpenAiModel::CHAT_GPT_3, $systemPrompt, [
-                'temperature' => $temperature
-            ], $messageDTO);
-            $result = '';
-            foreach ($stream as $response) {
-                $message = $response->choices[0]->toArray();
-                if (!empty($message['delta']['content'])) {
-                    $result .= $message['delta']['content'];
-                }
-                $this->sendSseMessage($message, 'message');
-            }
-//            $this->messageService->updateResultOpenAi($messageDTO, $result);
-
-//            if($assistantType == AssistantType::COMPLAINT){
-//                if(str_contains($result, 'PODSUMOWANIE')){
-//                    ComplaintGenerate::dispatch($result);
+//
+//        $sql = $this->openAiApi->completionChat(
+//            message: $prompt,
+//            systemPrompt: GetSelectPrompt::getPrompt()
+//        );
+//
+//        $loggerStep->addStep([
+//            'description' => 'Wygenerowanie sql',
+//            'prompt' => $prompt,
+//            'systemPrompt' => GetSelectPrompt::getPrompt(),
+//            'sql' => $sql,
+//        ]);
+//
+//        $result = DB::select(DB::raw($sql));
+//        $resultJson = json_encode($result);
+//
+//        $loggerStep->addStep([
+//            'description' => 'Pobranie danych i zamiana ich na json',
+//            'resultJson' => $resultJson,
+//        ]);
+//
+//        $systemPrompt = ResponseUserPrompt::getPrompt($prompt , $resultJson, $sql);
+//
+//        $loggerStep->addStep([
+//            'description' => 'Przygotowanie prompt do wysłania ostatecznej odpowiedzi',
+//            'systemPrompt' => $systemPrompt,
+//        ]);
+//
+//        return response()->stream(function () use ($prompt, $systemPrompt, $temperature, $loggerStep) {
+//            header('Content-Type: text/event-stream');
+//            header('Cache-Control: no-cache');
+//            header('Connection: keep-alive');
+//
+//            $stream = $this->openAiApi->chat($prompt, OpenAiModel::CHAT_GPT_3, $systemPrompt, [
+//                'temperature' => $temperature
+//            ]);
+//            $result = '';
+//            foreach ($stream as $response) {
+//                $message = $response->choices[0]->toArray();
+//                if (!empty($message['delta']['content'])) {
+//                    $result .= $message['delta']['content'];
 //                }
+//                $message['steps'] = $loggerStep->getSteps();
+//                $this->sendSseMessage($message, 'message');
 //            }
-        });
+//        });
     }
 
     /**

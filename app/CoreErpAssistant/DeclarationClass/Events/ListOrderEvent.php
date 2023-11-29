@@ -63,7 +63,7 @@ class ListOrderEvent extends Event
         $table = array_merge($table, $result);
 
         $systemPrompt = '';
-        $messageUser = 'Napisz, że już wyświetlasz informacje i nic więcej';
+        $messageUser = 'Napisz, że "Oto dane o które prosiłeś"';
 
         $messageProcessor->getLoggerStep()->addStep([
             'prompt' => $messageUser,

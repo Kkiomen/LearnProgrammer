@@ -12,9 +12,9 @@ use App\CoreErpAssistant\Prompts\ResponseUserPrompt;
 use App\CoreErpAssistant\Service\Event\EventResult;
 use Illuminate\Support\Facades\DB;
 
-class OrderEvent extends NormalSQLEvent
+class ProductEvent extends NormalSQLEvent
 {
-    protected ?string $name = 'order';
+    protected ?string $name = 'product';
     protected ?string $description = 'Pytania dotyczące zamówienia';
-    protected array $triggers = ['zamówień', 'zamówienia', 'zamówienie', 'zamówieniu'];
+    protected array $triggers = ['produkty', 'produkt', 'zamówienie'];
 }

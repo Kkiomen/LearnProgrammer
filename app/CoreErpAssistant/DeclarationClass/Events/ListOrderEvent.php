@@ -14,9 +14,9 @@ use Illuminate\Support\Facades\DB;
 
 class ListOrderEvent extends Event
 {
-    protected ?string $name = 'listOrder';
-    protected ?string $description = 'Wyświetlenie zamówień w formie tabeli. Np. wyświetl ostatnie zamówienia';
-    protected array $triggers = ['zamówień', 'zamówienia', 'zamówienie'];
+    protected ?string $name = 'listDataDatabaseByTable';
+    protected ?string $description = 'Wyświetlenie zamówień / produktów / klientów w formie tabeli. Np. wyświetl ostatnie zamówienia albo wyświetl coś w formie tabeli';
+    protected array $triggers = ['wyświetl', 'lista', 'listy', 'wymień', 'listy', 'tabela', 'tabeli'];
 
 
     public function __construct(

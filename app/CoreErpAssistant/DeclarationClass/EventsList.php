@@ -2,8 +2,10 @@
 
 namespace App\CoreErpAssistant\DeclarationClass;
 
+use App\CoreErpAssistant\DeclarationClass\Events\ClientEvent;
 use App\CoreErpAssistant\DeclarationClass\Events\ListOrderEvent;
 use App\CoreErpAssistant\DeclarationClass\Events\OrderEvent;
+use App\CoreErpAssistant\DeclarationClass\Events\ProductEvent;
 
 class EventsList
 {
@@ -15,7 +17,9 @@ class EventsList
     {
         return [
             OrderEvent::class,
-            ListOrderEvent::class
+            ListOrderEvent::class,
+            ClientEvent::class,
+            ProductEvent::class
         ];
     }
 }

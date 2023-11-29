@@ -20,7 +20,6 @@ return new class extends Migration
             $table->string('invoice_place');
             $table->date('invoice_date');
             $table->date('payment_date');
-            $table->string('delivery_name');
             $table->string('delivery_address');
             $table->string('delivery_city');
             $table->string('delivery_postal_code');
@@ -29,6 +28,9 @@ return new class extends Migration
             $table->string('delivery_email');
             $table->string('delivery_first_name');
             $table->string('delivery_last_name');
+            $table->integer('positions_count');
+            $table->decimal('positions_price_net_total');
+            $table->decimal('positions_price_gross_total');
             $table->timestamps();
         });
     }

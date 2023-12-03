@@ -1,11 +1,11 @@
 import {useEffect, useState} from "react";
-import ErpAssistantChatMessages from "../components/ErpAssistantChatMessages.jsx";
+import ErpAssistantChatMessages from "../../components/ErpAssistantChatMessages.jsx";
 import {useCookies} from "react-cookie";
-import generateNewHash from "../core/api/GenerateNewSessionHash.js";
-import scrollToBottom from "../core/utils/ScrollToBottom.js";
-import {generateUniqueId} from "../../functions/Helpers.js";
+import generateNewHash from "../../core/api/GenerateNewSessionHash.js";
+import scrollToBottom from "../../core/utils/ScrollToBottom.js";
+import {generateUniqueId} from "../../../functions/Helpers.js";
 
-export default function ErpAiAssistant() {
+export default function ErpAiAssistantCore({type, additional}) {
 
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
@@ -55,7 +55,9 @@ export default function ErpAiAssistant() {
     if (payload == null) {
       payload = {
         message: message,
-        session: sessionHash
+        session: sessionHash,
+        type: type,
+        additional: additional
       };
     }
 

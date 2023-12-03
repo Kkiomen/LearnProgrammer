@@ -12,8 +12,9 @@ import MainAppLayout from "./components/MainAppLayout.jsx";
 import AssistantChat from "./components/AssistantChat.jsx";
 import QuizDesignPattern from "./views/QuizDesignPattern.jsx";
 import ChatGPT from "./views/ChatGPT.jsx";
-import ErpAiAssistant from "./ErpAiAssistant/pages/ErpAiAssistant.jsx";
+import ErpAiAssistant from "./ErpAiAssistant/pages/ErpAssistant.jsx";
 import React from "react";
+import ComplaintsAssistant from "./ErpAiAssistant/pages/ComplaintsAssistant.jsx";
 
 const router = createBrowserRouter([
   {
@@ -136,6 +137,10 @@ const router = createBrowserRouter([
       {
         path: '/erp-assistant',
         element: <ErpAiAssistant/>
+      },
+      {
+        path: '/erp-complaints',
+        element: <ComplaintsAssistant/>
       }
     ]
   },

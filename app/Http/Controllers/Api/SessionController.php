@@ -1,27 +1,19 @@
 <?php
 
 namespace App\Http\Controllers\Api;
-use App\Core\Helper\ResponseHelper;
-use App\Services\SessionService;
+use App\CoreAssistant\Service\Message\SessionService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 class SessionController
 {
-
-
     public function __construct(
-        private readonly SessionService $sessionService,
-        private readonly ResponseHelper $responseHelper,
-    )
-    {
-    }
+        private SessionService $sessionService
+    ){}
 
     public function generateSession(Request $request): JsonResponse
     {
-        return $this->responseHelper->responseJSON(
-            [
-                'session_hash' => $this->sessionService->generateSession()
-            ]
-        );
+        return response()->json([
+            'session_hash' => $this->sessionService->generateSession()
+        ]);
     }
 }

@@ -7,7 +7,11 @@ use App\Api\Qdrant\Search\SearchRequest;
 use App\Api\Qdrant\Vector\VectorText;
 use App\Class\LongTermMemory;
 use App\Class\LongTermMemoryQdrant;
+use App\CoreAssistant\Adapter\Entity\Conversation\ConversationRepository;
+use App\CoreAssistant\Adapter\Entity\Message\MessageEloquentRepository;
+use App\CoreAssistant\Adapter\Entity\Message\MessageRepository;
 use App\CoreAssistant\Api\OpenAiApi;
+use App\CoreAssistant\Domain\Message\Message;
 use App\CoreAssistant\Dto\MessageProcessor\MessageProcessor;
 use App\CoreAssistant\Enum\OpenAiModel;
 use App\CoreAssistant\Prompts\CreateHeaderTablePrompt;
@@ -42,12 +46,28 @@ class TestController
     public function __construct(
         private readonly MessageFacade $messageFacade,
         private readonly OpenAiApi $openAiApi,
+        private readonly ConversationRepository $repository
     )
     {
     }
 
     public function test(Request $request)
     {
+
+
+
+
+
+        $repo = new MessageEloquentRepository();
+        /** @var Message $model */
+        $model = $this->repository->findById(4);
+        $model->setUserId(56);
+
+        $this->repository->save($model);
+
+        dump($this->repository->findById(4));
+
+
 //        $messageProcessor = new MessageProcessor();
 //        $messageProcessor->setMessageFromUser('Czy dzisiaj cokolwiek zakupiła u nas Chmielewska?');
 //
@@ -57,32 +77,36 @@ class TestController
 
 //        $system = SelectOrderPrompt::getPrompt();
 //        $message = 'Ile klient "RAWPOL" wydał w tym roku?';
-        $sql = "SELECT id, company_address
-FROM combo_orders
-ORDER BY created_at DESC
-LIMIT 15;";
-
-        $result = DB::select(DB::raw($sql));
-
-        $resultJson = json_encode($result);
-        echo $resultJson;
 
 
-        $message = json_encode($result[0]);
-        $system = CreateHeaderTablePrompt::getPrompt($sql);
 
-        $header =  $this->openAiApi->completionChat(
-            message: $message,
-            systemPrompt: $system,
-            model: OpenAiModel::CHAT_GPT_3
-        );
 
-        $table = [];
-
-        $table[] = json_decode($header, true)[0];
-        $table = array_merge($table, $result);
-
-        dd(json_encode($table));
+//        $sql = "SELECT id, company_address
+//FROM combo_orders
+//ORDER BY created_at DESC
+//LIMIT 15;";
+//
+//        $result = DB::select(DB::raw($sql));
+//
+//        $resultJson = json_encode($result);
+//        echo $resultJson;
+//
+//
+//        $message = json_encode($result[0]);
+//        $system = CreateHeaderTablePrompt::getPrompt($sql);
+//
+//        $header =  $this->openAiApi->completionChat(
+//            message: $message,
+//            systemPrompt: $system,
+//            model: OpenAiModel::CHAT_GPT_3
+//        );
+//
+//        $table = [];
+//
+//        $table[] = json_decode($header, true)[0];
+//        $table = array_merge($table, $result);
+//
+//        dd(json_encode($table));
 
 
 

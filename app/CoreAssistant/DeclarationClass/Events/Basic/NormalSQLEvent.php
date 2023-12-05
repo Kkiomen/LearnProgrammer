@@ -3,9 +3,10 @@
 namespace App\CoreAssistant\DeclarationClass\Events\Basic;
 
 use App\CoreAssistant\Abstract\Event;
-use App\CoreAssistant\Api\OpenAiApi;
+use App\CoreAssistant\Adapter\LLM\LanguageModel;
+use App\CoreAssistant\Adapter\LLM\LanguageModelSettings;
+use App\CoreAssistant\Adapter\LLM\LanguageModelType;
 use App\CoreAssistant\Dto\MessageProcessor\MessageProcessor;
-use App\CoreAssistant\Enum\OpenAiModel;
 use App\CoreAssistant\Prompts\OrderSQLPrompt;
 use App\CoreAssistant\Prompts\ResponseUserPrompt;
 use App\CoreAssistant\Service\Event\EventResult;
@@ -16,7 +17,7 @@ class NormalSQLEvent extends Event
     const MAX_ATTEMPTS = 3;
 
     public function __construct(
-        private readonly OpenAiApi $openAiApi,
+        private readonly LanguageModel $languageModel,
     ) {
     }
 
@@ -32,10 +33,10 @@ class NormalSQLEvent extends Event
         while ($attempt < self::MAX_ATTEMPTS && !$success) {
             try {
                 // Create SQL
-                $sql = $this->openAiApi->completionChat(
-                    message: $messageProcessor->getMessageFromUser(),
+                $sql = $this->languageModel->generate(
+                    prompt: $messageProcessor->getMessageFromUser(),
                     systemPrompt: OrderSQLPrompt::getPrompt(),
-                    model: OpenAiModel::GPT_4
+                    settings: (new LanguageModelSettings())->setLanguageModelType(LanguageModelType::INTELLIGENT)->setTemperature(0.5)
                 );
 
                 $messageProcessor->getLoggerStep()->addStep([
@@ -84,7 +85,7 @@ class NormalSQLEvent extends Event
             'resultSQL' => $resultJson,
         ], 'OrderEvent - Przekazanie do prompta końcowego');
 
-        // Preprare response to user
+        // Prepare response to user
         $result = new EventResult();
         $result->setMessageProcessor($messageProcessor);
         $result->setResultResponseUserMessage($messageProcessor->getMessageFromUser());

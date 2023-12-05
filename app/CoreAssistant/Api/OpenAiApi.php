@@ -4,8 +4,6 @@ namespace App\CoreAssistant\Api;
 use App\Class\Message\Interface\MessageInterface;
 use App\Class\Message\Repository\MessageRepository;
 use App\CoreAssistant\Enum\OpenAiModel;
-use App\Helpers\TokenHelper;
-use App\Models\TokenUsage;
 use OpenAI\Client;
 
 class OpenAiApi
@@ -25,7 +23,7 @@ class OpenAiApi
 
     /**
      * Return list of available Models OpenAi to use
-     * @return array
+     * @return array\
      */
     public function getModels(): array{
         $response =  $this->client->models()->list();
@@ -38,31 +36,31 @@ class OpenAiApi
      * @param OpenAiModel|null $model
      * @return array
      */
-    public function generateResult(string $prompt, OpenAiModel $model = null): array{
-        $model = $model ?? OpenAiModel::CHAT_GPT_3;
-
-        $response = $this->client->chat()->create([
-            'model' => $model->value,
-            'messages' => [
-                ['role' => 'user', 'content' => $prompt]
-            ],
-        ]);
-        $result = $response->toArray();
-
-        $tokens = $result['usage'];
-        $tokenUsage = TokenUsage::create([
-            'prompt_tokens' => $tokens['prompt_tokens'],
-            'completion_tokens' => $tokens['completion_tokens'],
-            'total_tokens' => $tokens['total_tokens'],
-            'estimated_cost' => TokenHelper::calcEstimatedCost($tokens['total_tokens']),
-            'response' => ''
-        ]);
-
-        return [
-            'response' => $result['choices'][0]['message']['content'],
-            'tokenUsage' => $tokenUsage
-        ];
-    }
+//    public function generateResult(string $prompt, OpenAiModel $model = null): array{
+//        $model = $model ?? OpenAiModel::CHAT_GPT_3;
+//
+//        $response = $this->client->chat()->create([
+//            'model' => $model->value,
+//            'messages' => [
+//                ['role' => 'user', 'content' => $prompt]
+//            ],
+//        ]);
+//        $result = $response->toArray();
+//
+//        $tokens = $result['usage'];
+//        $tokenUsage = TokenUsage::create([
+//            'prompt_tokens' => $tokens['prompt_tokens'],
+//            'completion_tokens' => $tokens['completion_tokens'],
+//            'total_tokens' => $tokens['total_tokens'],
+//            'estimated_cost' => TokenHelper::calcEstimatedCost($tokens['total_tokens']),
+//            'response' => ''
+//        ]);
+//
+//        return [
+//            'response' => $result['choices'][0]['message']['content'],
+//            'tokenUsage' => $tokenUsage
+//        ];
+//    }
 
 
     /**

@@ -11,6 +11,7 @@ use App\CoreAssistant\Adapter\Entity\Conversation\ConversationRepository;
 use App\CoreAssistant\Adapter\Entity\Message\MessageEloquentRepository;
 use App\CoreAssistant\Adapter\Entity\Message\MessageRepository;
 use App\CoreAssistant\Api\OpenAiApi;
+use App\CoreAssistant\DeclarationClass\Events\ListOrderEvent;
 use App\CoreAssistant\Domain\Message\Message;
 use App\CoreAssistant\Dto\MessageProcessor\MessageProcessor;
 use App\CoreAssistant\Enum\OpenAiModel;
@@ -46,7 +47,8 @@ class TestController
     public function __construct(
         private readonly MessageFacade $messageFacade,
         private readonly OpenAiApi $openAiApi,
-        private readonly ConversationRepository $repository
+        private readonly ConversationRepository $repository,
+        private readonly ListOrderEvent $listOrderEvent
     )
     {
     }
@@ -55,9 +57,11 @@ class TestController
     {
 
 
+        $messageProcessor = new MessageProcessor();
+        $messageProcessor->setMessageFromUser('Podaj w formie tabeli imię oraz nazwisko klientów którzy złożyli 3 ostatnie zamówienia');
+        $result = $this->listOrderEvent->handle($messageProcessor);
 
-
-
+        dd($result);
         $repo = new MessageEloquentRepository();
         /** @var Message $model */
         $model = $this->repository->findById(4);

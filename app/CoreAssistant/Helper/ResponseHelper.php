@@ -3,6 +3,7 @@
 namespace App\CoreAssistant\Helper;
 
 
+use App\CoreAssistant\Adapter\Entity\Message\MessageRepository;
 use App\CoreAssistant\Api\OpenAiApi;
 use App\CoreAssistant\Dto\MessageProcessor\MessageProcessor;
 use App\CoreAssistant\Dto\Response\ResponseDto;
@@ -14,7 +15,8 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 final class ResponseHelper
 {
     public function __construct(
-        private OpenAiApi $openAiApi
+        private OpenAiApi $openAiApi,
+        private MessageRepository $messageRepository
     ) {
     }
 
@@ -100,10 +102,12 @@ final class ResponseHelper
             }
 
             if($messageModel !== null){
-                $messageModel->result = $result;
-                $messageModel->prompt = $prompt;
-                $messageModel->system = $systemPrompt;
-                $messageModel->save();
+                $messageModel->setResult($result);
+                $messageModel->setPrompt($prompt);
+                $messageModel->setSteps(json_encode($loggerStep->getSteps()));
+                $messageModel->setSystem($systemPrompt);
+
+                $this->messageRepository->save($messageModel);
             }
 
         });

@@ -3,6 +3,9 @@
 namespace App\CoreAssistant\Service\MessageInterpreter;
 
 use App\CoreAssistant\Abstract\Event;
+use App\CoreAssistant\Adapter\LLM\LanguageModel;
+use App\CoreAssistant\Adapter\LLM\LanguageModelSettings;
+use App\CoreAssistant\Adapter\LLM\LanguageModelType;
 use App\CoreAssistant\Api\OpenAiApi;
 use App\CoreAssistant\DeclarationClass\EventsList;
 use App\CoreAssistant\Dto\MessageProcessor\MessageProcessor;
@@ -19,7 +22,7 @@ class MessageInterpreter implements MessageInterpreterInterface
 
     public function __construct(
         private readonly EventsList $eventsList,
-        private readonly OpenAiApi $openAiApi,
+        private readonly LanguageModel $languageModel,
     ){
         $this->eventListClasses = $this->prepareEventsList();
     }
@@ -84,7 +87,10 @@ class MessageInterpreter implements MessageInterpreterInterface
      */
     private function chooseEvent(string $content): string
     {
-        return $this->openAiApi->completionChat($content, ChooseEventPromptHelper::getPrompt($this->getListsEventToChoose(true)), OpenAiModel::GPT_4
+        return $this->languageModel->generate(
+            prompt: $content,
+            systemPrompt: ChooseEventPromptHelper::getPrompt($this->getListsEventToChoose(true)),
+            settings: (new LanguageModelSettings())->setLanguageModelType(LanguageModelType::INTELLIGENT)->setTemperature(0.3)
         );
     }
 
@@ -118,14 +124,20 @@ class MessageInterpreter implements MessageInterpreterInterface
      */
     private function usedTriggerInContent(string $content): bool
     {
+        $result = false;
+        $listOfEventsHandledByTriggers = [];
+
         foreach ($this->eventListClasses as $eventClass) {
             foreach ($eventClass->getTriggers() as $trigger){
                 if(str_contains(strtolower($content), strtolower($trigger))){
-                    return true;
+                    $result = true;
+                    $listOfEventsHandledByTriggers[] = $eventClass;
                 }
             }
         }
-        return false;
+
+        $this->eventListClasses = $listOfEventsHandledByTriggers;
+        return $result;
     }
 
     /**

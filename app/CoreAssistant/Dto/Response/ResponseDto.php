@@ -2,10 +2,9 @@
 
 namespace App\CoreAssistant\Dto\Response;
 
+use App\CoreAssistant\Domain\Message\Message;
 use App\CoreAssistant\Dto\MessageProcessor\LoggerStep\LoggerSteps;
 use App\CoreAssistant\Enum\OpenAiModel;
-use App\Models\Message;
-
 class ResponseDto
 {
     private string $userMessage;

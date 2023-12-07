@@ -6,5 +6,5 @@ use App\CoreAssistant\Core\Domain\Abstract\Entity;
 
 interface SaveRepository
 {
-    public function save(Entity $entity): bool;
+    public function save(Entity $entity): Entity|bool;
 }

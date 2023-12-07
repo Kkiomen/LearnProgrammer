@@ -63,6 +63,17 @@ return [
             ]) : [],
         ],
 
+        'firebird' => [
+            'driver'   => 'firebird',
+            'host'     => env('DB_FIREBIRD_HOST', 'localhost'),
+            'port'     => env('DB_FIREBIRD_PORT', '3050'),
+            'database' => env('DB_FIREBIRD_DATABASE', '/path_to/database.fdb'),
+            'username' => env('DB_FIREBIRD_USERNAME', 'sysdba'),
+            'password' => env('DB_FIREBIRD_PASSWORD', 'masterkey'),
+            'charset'  => env('DB_FIREBIRD_CHARSET', 'UTF8'),
+            'role'     => env('DB_FIREBIRD_ROLE', null),
+        ],
+
         'pgsql' => [
             'driver' => 'pgsql',
             'url' => env('DATABASE_URL'),

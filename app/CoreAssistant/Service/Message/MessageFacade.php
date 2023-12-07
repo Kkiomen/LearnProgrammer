@@ -65,6 +65,7 @@ class MessageFacade implements MessageFacadeInterface
             'message' => $messageProcessor->getMessageFromUser(),
         ], 'MessageFacade - loadMessageProcessor');
 
+        $this->prepareMessages($messageProcessor);
         $this->messageProcessor = $messageProcessor;
     }
 

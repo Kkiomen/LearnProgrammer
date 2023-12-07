@@ -12,11 +12,13 @@ use App\CoreAssistant\Adapter\Entity\Message\MessageEloquentRepository;
 use App\CoreAssistant\Adapter\Entity\Message\MessageRepository;
 use App\CoreAssistant\Api\OpenAiApi;
 use App\CoreAssistant\DeclarationClass\Events\ListOrderEvent;
+use App\CoreAssistant\Domain\Conversation\Conversation;
 use App\CoreAssistant\Domain\Message\Message;
 use App\CoreAssistant\Dto\MessageProcessor\MessageProcessor;
 use App\CoreAssistant\Enum\OpenAiModel;
 use App\CoreAssistant\Prompts\CreateHeaderTablePrompt;
 use App\CoreAssistant\Service\Interfaces\MessageFacadeInterface;
+use App\CoreAssistant\Service\Message\ConversationService;
 use App\CoreAssistant\Service\Message\MessageFacade;
 use App\Enum\QuizType;
 use App\Jobs\ComplaintGenerate;
@@ -48,28 +50,44 @@ class TestController
         private readonly MessageFacade $messageFacade,
         private readonly OpenAiApi $openAiApi,
         private readonly ConversationRepository $repository,
-        private readonly ListOrderEvent $listOrderEvent
+        private readonly ListOrderEvent $listOrderEvent,
+        private readonly ConversationService $conversationService,
     )
     {
     }
 
     public function test(Request $request)
     {
-
-
         $messageProcessor = new MessageProcessor();
-        $messageProcessor->setMessageFromUser('Podaj w formie tabeli imię oraz nazwisko klientów którzy złożyli 3 ostatnie zamówienia');
-        $result = $this->listOrderEvent->handle($messageProcessor);
+        $messageProcessor->setMessageFromUser('Jakie id ma produkt Talerz obiadowy głęboki 23 cm biały kwadrat?');
+        $messageProcessor->setSessionHash('d1ce2a50-24a3-44f4-9b30-0aec2878600f');
 
+        $this->messageFacade->loadMessageProcessor($messageProcessor);
+        $result = $this->messageFacade->processAndReturnResponse();
+
+//        $message = $this->conversationService->createMessage($messageProcessor);
         dd($result);
-        $repo = new MessageEloquentRepository();
-        /** @var Message $model */
-        $model = $this->repository->findById(4);
-        $model->setUserId(56);
 
-        $this->repository->save($model);
+        $conversation = new Conversation();
+        $conversation->setSessionHash('d1ce2a50-24a3-44f4-9b30-0aec2878600f');
 
-        dump($this->repository->findById(4));
+        $d = $this->repository->save($conversation);
+
+        dump($d);
+
+//        $messageProcessor = new MessageProcessor();
+//        $messageProcessor->setMessageFromUser('Podaj w formie tabeli imię oraz nazwisko klientów którzy złożyli 3 ostatnie zamówienia');
+//        $result = $this->listOrderEvent->handle($messageProcessor);
+//
+//        dd($result);
+//        $repo = new MessageEloquentRepository();
+//        /** @var Message $model */
+//        $model = $this->repository->findById(4);
+//        $model->setUserId(56);
+//
+//        $this->repository->save($model);
+//
+//        dump($this->repository->findById(4));
 
 
 //        $messageProcessor = new MessageProcessor();

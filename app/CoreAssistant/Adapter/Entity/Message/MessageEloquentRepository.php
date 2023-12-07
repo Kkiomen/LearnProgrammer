@@ -37,7 +37,12 @@ class MessageEloquentRepository extends EloquentRepository implements MessageRep
 
     function mapEntityToModel(Entity $entity): Model
     {
-        $message = $this->getOrCreateModel($entity->getId());
+        if($entity->getId() !== null){
+            $message = $this->getOrCreateModel($entity->getId());
+        }else{
+            $message = new Message();
+        }
+
         $message->user_id = $entity->getUserId();
         $message->conversation_id = $entity->getConversationId();
         $message->user_message = $entity->getUserMessage();

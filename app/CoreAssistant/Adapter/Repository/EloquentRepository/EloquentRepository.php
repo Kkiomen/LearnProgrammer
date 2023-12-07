@@ -34,7 +34,7 @@ abstract class EloquentRepository implements RepositoryInterface
         $model = new $this->model();
         $model = $model::find($id);
 
-        return $this->mapModelToEntity($model);
+        return $model ? $this->mapModelToEntity($model) : null;
     }
 
     public function findBy(array $criteria): ?Collection
@@ -43,8 +43,13 @@ abstract class EloquentRepository implements RepositoryInterface
             throw new NullModelForEloquentRepository();
         }
 
+        $this->validateCriteria($criteria);
+
+        $key = key($criteria);
+        $value = $criteria[$key];
+
         $model = new $this->model();
-        $modelsFromEloquent = $model::where($criteria)->get();
+        $modelsFromEloquent = $model::where($key, $value)->get();
 
         return $this->convertToCollection($modelsFromEloquent);
     }
@@ -55,10 +60,15 @@ abstract class EloquentRepository implements RepositoryInterface
             throw new NullModelForEloquentRepository();
         }
 
-        $model = new $this->model();
-        $model = $model::where($criteria)->first();
+        $this->validateCriteria($criteria);
 
-        return $this->mapModelToEntity($model);
+        $key = key($criteria);
+        $value = $criteria[$key];
+
+        $model = new $this->model();
+        $model = $model::where($key, $value)->first();
+
+        return $model ? $this->mapModelToEntity($model) : null;
     }
 
     public function exists(array $criteria): bool
@@ -67,26 +77,22 @@ abstract class EloquentRepository implements RepositoryInterface
             throw new NullModelForEloquentRepository();
         }
 
+        $this->validateCriteria($criteria);
+
+        $key = key($criteria);
+        $value = $criteria[$key];
+
         $model = new $this->model();
-        return $model::where($criteria)->exists();
+        return $model::where($key, $value)->exists();
     }
 
-    public function save(Entity $entity): bool
+    public function save(Entity $entity): Entity|bool
     {
         $model = $this->mapEntityToModel($entity);
-
-        return $model->save();
-    }
-
-    private function convertToCollection(\Illuminate\Database\Eloquent\Collection $collectionsModel): Collection
-    {
-        $collection = new Collection();
-
-        foreach ($collectionsModel as $model){
-            $collection->add($this->mapModelToEntity($model));
+        if($model->save()){
+            return $this->mapModelToEntity($model);
         }
-
-        return $collection;
+        return false;
     }
 
     protected function getOrCreateModel(int $id): Model
@@ -103,6 +109,29 @@ abstract class EloquentRepository implements RepositoryInterface
         }
 
         return $model;
+    }
+
+
+    private function convertToCollection(\Illuminate\Database\Eloquent\Collection $collectionsModel): Collection
+    {
+        $collection = new Collection();
+
+        foreach ($collectionsModel as $model){
+            $collection->add($this->mapModelToEntity($model));
+        }
+
+        return $collection;
+    }
+
+    private function validateCriteria(array $criteria): void
+    {
+        if(empty($criteria)){
+            throw new \InvalidArgumentException('Criteria cannot be empty');
+        }
+
+        if(count($criteria) !== 1){
+            throw new \InvalidArgumentException('Criteria must have only one element');
+        }
     }
 
     abstract function mapModelToEntity(Model $model): Entity;

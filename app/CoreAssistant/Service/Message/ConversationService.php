@@ -2,50 +2,58 @@
 
 namespace App\CoreAssistant\Service\Message;
 
+use App\CoreAssistant\Adapter\Entity\Conversation\ConversationRepository;
+use App\CoreAssistant\Adapter\Entity\Message\MessageRepository;
+use App\CoreAssistant\Core\Collection\Collection;
+use App\CoreAssistant\Core\Domain\Abstract\Entity;
+use App\CoreAssistant\Domain\Conversation\Conversation;
+use App\CoreAssistant\Domain\Message\Message;
 use App\CoreAssistant\Dto\MessageProcessor\MessageProcessor;
-use App\Models\Conversation;
-use App\Models\Message;
-use Illuminate\Database\Eloquent\Collection;
 
 class ConversationService
 {
-    public function createMessage(MessageProcessor $messageProcessor): Message
+    public function __construct(
+      private readonly ConversationRepository $conversationRepository,
+      private readonly MessageRepository $messageRepository
+    ){}
+
+    public function createMessage(MessageProcessor $messageProcessor): Message|Entity
     {
         $conversation = $this->getOrCreateConversations($messageProcessor->getSessionHash());
 
-        return Message::create([
-            'conversation_id' => $conversation->id,
-            'user_message' => $messageProcessor->getMessageFromUser()
-        ]);
+        $message = new Message();
+        $message->setConversationId($conversation->getId());
+
+        return $this->messageRepository->save($message);
     }
 
 
-    public function getOrCreateConversations(string $sessionHash): Conversation
+    public function getOrCreateConversations(string $sessionHash): Conversation|Entity
     {
-        $conversation = Conversation::where('session_hash')->first();
+        $conversation = $this->conversationRepository->findOneBy(['session_hash' => $sessionHash]);
 
         if($conversation){
             return $conversation;
         }
 
-        return Conversation::create([
-            'session_hash' => $sessionHash
-        ]);
+        $conversation = new Conversation();
+        $conversation->setSessionHash($sessionHash);
+        return $this->conversationRepository->save($conversation);
     }
 
-    public function getConversationMessages(?string $sessionHash): array
+    public function getConversationMessages(?string $sessionHash): Collection
     {
-        $conversation = Conversation::where('session_hash', $sessionHash)->first();
+        $conversation = $this->conversationRepository->findBy(['session_hash' => $sessionHash]);
 
         if($conversation){
-            return $conversation->messages->toArray();
+            return $conversation;
         }
 
-        return [];
+        return new Collection();
     }
 
     public function isExistsConversationBySessionHash(string $sessionHash): bool
     {
-        return Conversation::where('session_hash', $sessionHash)->exists();
+        return $this->conversationRepository->exists(['session_hash' => $sessionHash]);
     }
 }

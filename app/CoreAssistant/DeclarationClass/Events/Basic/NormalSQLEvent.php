@@ -6,11 +6,11 @@ use App\CoreAssistant\Abstract\Event;
 use App\CoreAssistant\Adapter\LLM\LanguageModel;
 use App\CoreAssistant\Adapter\LLM\LanguageModelSettings;
 use App\CoreAssistant\Adapter\LLM\LanguageModelType;
+use App\CoreAssistant\Adapter\Repository\Interface\RepositorySqlInterface;
 use App\CoreAssistant\Dto\MessageProcessor\MessageProcessor;
 use App\CoreAssistant\Prompts\OrderSQLPrompt;
 use App\CoreAssistant\Prompts\ResponseUserPrompt;
 use App\CoreAssistant\Service\Event\EventResult;
-use Illuminate\Support\Facades\DB;
 
 class NormalSQLEvent extends Event
 {
@@ -18,6 +18,7 @@ class NormalSQLEvent extends Event
 
     public function __construct(
         private readonly LanguageModel $languageModel,
+        private readonly RepositorySqlInterface $repositorySql
     ) {
     }
 
@@ -46,7 +47,7 @@ class NormalSQLEvent extends Event
                 ], 'OrderEvent - Wygenerowany SQL');
 
                 // Execute SQL to get result
-                $result = DB::select(DB::raw($sql));
+                $result = $this->repositorySql->select($sql);
                 $resultJson = json_encode($result);
 
                 $success = true;

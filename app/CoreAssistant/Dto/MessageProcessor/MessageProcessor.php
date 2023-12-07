@@ -2,8 +2,9 @@
 
 namespace App\CoreAssistant\Dto\MessageProcessor;
 
+use App\CoreAssistant\Core\Collection\Collection;
+use App\CoreAssistant\Domain\Message\Message;
 use App\CoreAssistant\Dto\MessageProcessor\LoggerStep\LoggerSteps;
-use App\Models\Message;
 
 class MessageProcessor
 {
@@ -16,7 +17,7 @@ class MessageProcessor
 
     private Message $message;
 
-    private array $conversationMessages;
+    private Collection $conversationMessages;
 
     public function __construct()
     {
@@ -105,12 +106,12 @@ class MessageProcessor
         return $this;
     }
 
-    public function getConversationMessages(): array
+    public function getConversationMessages(): Collection
     {
         return $this->conversationMessages;
     }
 
-    public function setConversationMessages(array $conversationMessages): self
+    public function setConversationMessages(Collection $conversationMessages): self
     {
         $this->conversationMessages = $conversationMessages;
 

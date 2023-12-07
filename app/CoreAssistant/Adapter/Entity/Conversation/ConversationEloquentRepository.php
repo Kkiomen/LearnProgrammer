@@ -34,13 +34,18 @@ class ConversationEloquentRepository extends EloquentRepository implements Conve
 
     function mapEntityToModel(\App\CoreAssistant\Domain\Conversation\Conversation|Entity $entity): Model
     {
-        $conversation = $this->getOrCreateModel($entity->getId());
+        if($entity->getId() !== null){
+            $conversation = $this->getOrCreateModel($entity->getId());
+        }else{
+            $conversation = new Conversation();
+        }
+
         $conversation->user_id = $entity->getUserId();
         $conversation->assistant_id = $entity->getAssistantId();
         $conversation->consultant_id = $entity->getConsultantId();
         $conversation->session_hash = $entity->getSessionHash();
         $conversation->title = $entity->getTitle();
-        $conversation->active = $entity->getActive();
+        $conversation->active = $entity->getActive() ?? true;
         $conversation->status = !empty($entity->getStatus()) ? $entity->getStatus()->value : ConversationStatus::ASSISTANT->value;
 
         $createdAt = Carbon::instance($entity->getCreatedAt() ?? new \DateTime());

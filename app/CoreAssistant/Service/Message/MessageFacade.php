@@ -55,7 +55,7 @@ class MessageFacade implements MessageFacadeInterface
 
     public function prepareMessages(MessageProcessor $messageProcessor): void
     {
-        $messageProcessor->setMessage($this->conversationService->createMessage($messageProcessor));
+        $messageProcessor->setMessage($this->conversationService->createMessage($messageProcessor, false));
         $messageProcessor->setConversationMessages($this->conversationService->getConversationMessages($messageProcessor->getSessionHash()));
     }
 

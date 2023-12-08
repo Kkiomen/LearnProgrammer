@@ -30,6 +30,7 @@ Route::post('/erp/message/new', [AssistantMessageController::class, 'newMessage'
 
 
 Route::post('/message/new', [MessageController::class, 'newMessage']);
+Route::post('/message/playground/new', [MessageController::class, 'newMessagePlayground']);
 Route::post('/messages', [MessageController::class, 'getMessagesConversation']);
 Route::post('/messages/clear', [MessageController::class, 'clearConversation']);
 Route::get('/session', [SessionController::class, 'generateSession']);

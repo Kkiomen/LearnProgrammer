@@ -50,6 +50,7 @@ class NormalSQLEvent extends Event
                 $result = $this->repositorySql->select($sql);
                 $resultJson = json_encode($result);
 
+                $messageProcessor->getLoggerSql()->addQuerySql($sql);
                 $success = true;
 
             } catch (\Exception $e) {

@@ -83,6 +83,14 @@ class MessageBuilder implements BuilderEntity
 
         return $this;
     }
+
+    public function setQueries(?string $queries): self
+    {
+        $this->message->setSteps($queries);
+
+        return $this;
+    }
+
     public function setTable(?string $table): self
     {
         $this->message->setTable($table);

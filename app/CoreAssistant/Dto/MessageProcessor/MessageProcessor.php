@@ -4,6 +4,7 @@ namespace App\CoreAssistant\Dto\MessageProcessor;
 
 use App\CoreAssistant\Core\Collection\Collection;
 use App\CoreAssistant\Domain\Message\Message;
+use App\CoreAssistant\Dto\MessageProcessor\LoggerSql\LoggerSql;
 use App\CoreAssistant\Dto\MessageProcessor\LoggerStep\LoggerSteps;
 
 class MessageProcessor
@@ -11,17 +12,19 @@ class MessageProcessor
     private ?string $messageFromUser = null;
     private string $systemPrompt;
     private LoggerSteps $loggerStep;
+    private LoggerSql $loggerSql;
     private ?string $functionClass = null;
 
     private ?string $sessionHash = null;
 
-    private Message $message;
+    private Message|bool $message;
 
     private Collection $conversationMessages;
 
     public function __construct()
     {
         $this->loggerStep = new LoggerSteps();
+        $this->loggerSql = new LoggerSql();
     }
 
 
@@ -83,6 +86,22 @@ class MessageProcessor
 
     //  ====  Function Class  ====
 
+    //  ====  Logger Sql  ====
+
+    public function getLoggerSql(): LoggerSql
+    {
+        return $this->loggerSql;
+    }
+
+    public function setLoggerSql(LoggerSql $loggerSql): self
+    {
+        $this->loggerSql = $loggerSql;
+
+        return $this;
+    }
+
+    //  ====  Logger Sq;  ====
+
 
     public function getSessionHash(): ?string
     {
@@ -99,7 +118,7 @@ class MessageProcessor
         return $this->message;
     }
 
-    public function setMessage(Message $message): self
+    public function setMessage(Message|bool $message): self
     {
         $this->message = $message;
 

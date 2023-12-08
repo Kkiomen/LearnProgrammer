@@ -39,6 +39,7 @@ final class ResponseHelper
         $response->setTemperature($temperature);
         $response->setMessage($messageProcessor->getMessage());
         $response->setLoggerStep($messageProcessor->getLoggerStep());
+        $response->setLoggerSql($messageProcessor->getLoggerSql());
         $response->setTable($eventResult->getResultResponseTable());
 
         return $response;
@@ -74,10 +75,11 @@ final class ResponseHelper
         $systemPrompt = $response->getSystemPrompt();
         $temperature = $response->getTemperature();
         $loggerStep = $response->getLoggerStep();
+        $loggerSql = $response->getLoggerSql();
         $table = $response->getTable();
         $messageModel = $response->getMessage();
 
-        return response()->stream(function () use ($prompt, $systemPrompt, $temperature, $loggerStep, $table, $messageModel) {
+        return response()->stream(function () use ($prompt, $systemPrompt, $temperature, $loggerStep, $loggerSql, $table, $messageModel) {
             header('Content-Type: text/event-stream');
             header('Cache-Control: no-cache');
             header('Connection: keep-alive');
@@ -105,6 +107,7 @@ final class ResponseHelper
                 $messageModel->setResult($result);
                 $messageModel->setPrompt($prompt);
                 $messageModel->setSteps(json_encode($loggerStep->getSteps()));
+                $messageModel->setQueries(json_encode($loggerSql->getQueriesSql()));
                 $messageModel->setSystem($systemPrompt);
 
                 $this->messageRepository->save($messageModel);

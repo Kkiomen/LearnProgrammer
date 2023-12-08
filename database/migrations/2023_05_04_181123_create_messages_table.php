@@ -24,6 +24,7 @@ return new class extends Migration
             $table->text('system')->nullable();
             $table->text('result')->nullable();
             $table->json('steps')->nullable();
+            $table->json('queries')->nullable();
             $table->json('table')->nullable();
             $table->text('links')->nullable();
             $table->timestamps();

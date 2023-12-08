@@ -26,7 +26,7 @@ export default function ChatGPT({navigation}) {
 
   useEffect(() => {
     generateNewHash();
-    getMessagesConversation();
+    // getMessagesConversation();
   }, [assistantId]);
 
   const generateNewHash = () => {
@@ -174,7 +174,7 @@ export default function ChatGPT({navigation}) {
     // let id = generateUniqueId(messages);
     // ====  CHAT GPT  ====
     const token = localStorage.getItem('ACCESS_TOKEN');
-    const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/message/new`, {
+    const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/message/playground/new`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -261,7 +261,7 @@ export default function ChatGPT({navigation}) {
     await readStream();
     // ====  CHAT GPT  ====
     // getLinkForMessage(message, assistantId, aiMessage);
-    getMessagesConversation();
+    // getMessagesConversation();
     setMessage("");
     setCanSendMessage(true);
   }
@@ -321,10 +321,10 @@ export default function ChatGPT({navigation}) {
         setCookie("sessionHash_" + assistantId, undefined);
         generateHash();
         setMessage([]);
-        getMessagesConversation();
+        // getMessagesConversation();
       })
     generateHash();
-    getMessagesConversation();
+    // getMessagesConversation();
     scrollToBottom();
   }
 

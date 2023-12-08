@@ -32,6 +32,7 @@ class MessageController
         private readonly ConversationService $conversationService,
         private MessageService $messageService,
         private readonly RequestDTOFactory $requestDTOFactory,
+        private OpenAiApi $openAiApi,
     ) {
     }
 
@@ -56,36 +57,39 @@ class MessageController
             ->setTemperature($request->get('temperature'));
 
         return $this->responseHelper->responseStream($responseDTO);
+    }
 
-//        /** @var OpenAiApi $openAi */
-//        $openAi = app(OpenAiApi::class);
-//
-//
-//        return response()->stream(function () use ($request, $openAi, $messageDTO) {
-//            header('Content-Type: text/event-stream');
-//            header('Cache-Control: no-cache');
-//            header('Connection: keep-alive');
-//
-//            $stream = $openAi->chat($request->get('message'), OpenAiModel::CHAT_GPT_3, $request->get('system'), [
-//                'temperature' => $request->get('temperature')
-//            ], null);
-//
-//            $result = '';
-//            foreach ($stream as $response) {
-//                $message = $response->choices[0]->toArray();
-//                if (!empty($message['delta']['content'])) {
-//                    $result .= $message['delta']['content'];
-//                }
-//                $this->sendSseMessage($message, 'message');
-//            }
+    public function newMessagePlayground(Request $request): StreamedResponse
+    {
+
+        $prompt = $request->get('message');
+        $systemPrompt = $request->get('system');
+        $temperature = $request->get('temperature');
+
+        return response()->stream(function () use ($prompt, $systemPrompt, $temperature) {
+            header('Content-Type: text/event-stream');
+            header('Cache-Control: no-cache');
+            header('Connection: keep-alive');
+
+            $stream = $this->openAiApi->chat($prompt, OpenAiModel::GPT_4, $systemPrompt, [
+                'temperature' => $temperature
+            ]);
+            $result = '';
+            foreach ($stream as $response) {
+                $message = $response->choices[0]->toArray();
+                if (!empty($message['delta']['content'])) {
+                    $result .= $message['delta']['content'];
+                }
+                $this->sendSseMessage($message, 'message');
+            }
 //            $this->messageService->updateResultOpenAi($messageDTO, $result);
-//
-////            if($assistantType == AssistantType::COMPLAINT){
-////                if(str_contains($result, 'PODSUMOWANIE')){
-////                    ComplaintGenerate::dispatch($result);
-////                }
-////            }
-//        });
+
+//            if($assistantType == AssistantType::COMPLAINT){
+//                if(str_contains($result, 'PODSUMOWANIE')){
+//                    ComplaintGenerate::dispatch($result);
+//                }
+//            }
+        });
     }
 
     private function createMessage(): MessageInterface

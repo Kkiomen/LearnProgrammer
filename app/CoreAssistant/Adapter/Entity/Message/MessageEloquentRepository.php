@@ -27,6 +27,7 @@ class MessageEloquentRepository extends EloquentRepository implements MessageRep
             ->setSystem($model->system)
             ->setResult($model->result)
             ->setSteps($model->steps)
+            ->setQueries($model->queries)
             ->setTable($model->table)
             ->setLinks($model->links)
             ->setCreatedAt($model->created_at->toDateTime())
@@ -53,6 +54,7 @@ class MessageEloquentRepository extends EloquentRepository implements MessageRep
         $message->result = $entity->getResult();
         $message->steps = $entity->getSteps();
         $message->table = $entity->getTable();
+        $message->queries = $entity->getQueries();
         $message->links = $entity->getLinks();
 
         $createdAt = Carbon::instance($entity->getCreatedAt() ?? new \DateTime());

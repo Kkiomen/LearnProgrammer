@@ -15,6 +15,7 @@ class Message extends Entity
     private ?string $system = null;
     private ?string $result = null;
     private ?string $steps = null;
+    private ?string $queries = null;
     private ?string $table = null;
     private ?string $links = null;
 
@@ -146,6 +147,18 @@ class Message extends Entity
     public function setLinks(?string $links): self
     {
         $this->links = $links;
+
+        return $this;
+    }
+
+    public function getQueries(): ?string
+    {
+        return $this->queries;
+    }
+
+    public function setQueries(?string $queries): self
+    {
+        $this->queries = $queries;
 
         return $this;
     }

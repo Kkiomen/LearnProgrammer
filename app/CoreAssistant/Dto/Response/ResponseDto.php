@@ -3,6 +3,7 @@
 namespace App\CoreAssistant\Dto\Response;
 
 use App\CoreAssistant\Domain\Message\Message;
+use App\CoreAssistant\Dto\MessageProcessor\LoggerSql\LoggerSql;
 use App\CoreAssistant\Dto\MessageProcessor\LoggerStep\LoggerSteps;
 use App\CoreAssistant\Enum\OpenAiModel;
 class ResponseDto
@@ -12,6 +13,7 @@ class ResponseDto
     private OpenAiModel $openAiModel = OpenAiModel::CHAT_GPT_3;
     private float $temperature = 0.9;
     private ?LoggerSteps $loggerStep = null;
+    private ?LoggerSql $loggerSql = null;
     private array $table = [];
     private ?Message $message;
 
@@ -95,6 +97,18 @@ class ResponseDto
     public function setMessage(?Message $message): self
     {
         $this->message = $message;
+
+        return $this;
+    }
+
+    public function getLoggerSql(): ?LoggerSql
+    {
+        return $this->loggerSql;
+    }
+
+    public function setLoggerSql(?LoggerSql $loggerSql): self
+    {
+        $this->loggerSql = $loggerSql;
 
         return $this;
     }

@@ -17,14 +17,14 @@ class ConversationService
       private readonly MessageRepository $messageRepository
     ){}
 
-    public function createMessage(MessageProcessor $messageProcessor): Message|Entity
+    public function createMessage(MessageProcessor $messageProcessor): Message|Entity|bool
     {
         $conversation = $this->getOrCreateConversations($messageProcessor->getSessionHash());
 
         $message = new Message();
         $message->setConversationId($conversation->getId());
-
-        return $this->messageRepository->save($message);
+        $message = $this->messageRepository->save($message);
+        return $message;
     }
 
 

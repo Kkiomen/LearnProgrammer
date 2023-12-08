@@ -10,6 +10,7 @@ use App\Class\LongTermMemoryQdrant;
 use App\CoreAssistant\Adapter\Entity\Conversation\ConversationRepository;
 use App\CoreAssistant\Adapter\Entity\Message\MessageEloquentRepository;
 use App\CoreAssistant\Adapter\Entity\Message\MessageRepository;
+use App\CoreAssistant\Adapter\LLM\LanguageModel;
 use App\CoreAssistant\Api\OpenAiApi;
 use App\CoreAssistant\DeclarationClass\Events\ListOrderEvent;
 use App\CoreAssistant\Domain\Conversation\Conversation;
@@ -52,21 +53,34 @@ class TestController
         private readonly ConversationRepository $repository,
         private readonly ListOrderEvent $listOrderEvent,
         private readonly ConversationService $conversationService,
+        private readonly LanguageModel $languageModel
     )
     {
     }
 
     public function test(Request $request)
     {
+        dd($this->repository->findAllMessages('d1ce2a50-24a3-44f4-9b30-0aec2878600f'));
+
+
+
         $messageProcessor = new MessageProcessor();
         $messageProcessor->setMessageFromUser('Jakie id ma produkt Talerz obiadowy głęboki 23 cm biały kwadrat?');
         $messageProcessor->setSessionHash('d1ce2a50-24a3-44f4-9b30-0aec2878600f');
 
         $this->messageFacade->loadMessageProcessor($messageProcessor);
-        $result = $this->messageFacade->processAndReturnResponse();
+        $this->messageFacade->processAndReturnResponse();
+
+        $messageProcessor = new MessageProcessor();
+        $messageProcessor->setMessageFromUser('Jaki klient dokonał najwięcej zamówień?');
+        $messageProcessor->setSessionHash('d1ce2a50-24a3-44f4-9b30-0aec2878600f');
+
+        $this->messageFacade->loadMessageProcessor($messageProcessor);
+        $this->messageFacade->processAndReturnResponse();
+
 
 //        $message = $this->conversationService->createMessage($messageProcessor);
-        dd($result);
+        dd('done');
 
         $conversation = new Conversation();
         $conversation->setSessionHash('d1ce2a50-24a3-44f4-9b30-0aec2878600f');

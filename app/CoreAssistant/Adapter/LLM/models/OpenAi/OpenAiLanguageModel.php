@@ -6,6 +6,8 @@ use App\CoreAssistant\Adapter\LLM\exceptions\NotHandledLanguageModelSettingsClas
 use App\CoreAssistant\Adapter\LLM\LanguageModel;
 use App\CoreAssistant\Adapter\LLM\LanguageModelSettings;
 use App\CoreAssistant\Adapter\LLM\LanguageModelType;
+use App\CoreAssistant\Core\Collection\Collection;
+use App\CoreAssistant\Domain\Message\Message;
 use OpenAI\Client;
 
 class OpenAiLanguageModel implements LanguageModel
@@ -59,5 +61,37 @@ class OpenAiLanguageModel implements LanguageModel
         };
 
         return $model;
+    }
+
+    public function generateStreamWithConversation(string $prompt, string $systemPrompt, LanguageModelSettings $settings, Collection $collectionOfMessages): mixed
+    {
+        $messages = [];
+        $openAiModel = $this->getOpenAiModelBySettings($settings);
+
+        // ============ Prepare Messages ============
+        $messages[] = ['role' => 'system', 'content' => $systemPrompt];
+        /** @var Message $message */
+        foreach ($collectionOfMessages as $message){
+            if(!empty($message->getPrompt())){
+                $messages[] = ['role' => 'user', 'content' => $message->getPrompt()];
+            }
+
+
+            if(!empty($message->getResult())){
+                $sqlQueries = !empty($message->getQueries()) ? 'To generate was used SQLs: '. $message->getQueries() : '';
+                $messages[] = ['role' => 'user', 'content' => $message->getResult() . $sqlQueries];
+            }
+
+        }
+        $messages[] = ['role' => 'user', 'content' => $prompt];
+        // ============ Prepare Messages ============
+
+        $openAiModelParamsToGenerate = [
+            'temperature' => $settings->getTemperature(),
+            'model' => $openAiModel->value,
+            'messages' => $messages
+        ];
+
+        return $this->client->chat()->createStreamed($openAiModelParamsToGenerate);
     }
 }

@@ -112,7 +112,7 @@ abstract class EloquentRepository implements RepositoryInterface
     }
 
 
-    private function convertToCollection(\Illuminate\Database\Eloquent\Collection $collectionsModel): Collection
+    protected function convertToCollection(\Illuminate\Database\Eloquent\Collection $collectionsModel): Collection
     {
         $collection = new Collection();
 

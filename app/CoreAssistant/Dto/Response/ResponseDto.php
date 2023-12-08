@@ -2,6 +2,7 @@
 
 namespace App\CoreAssistant\Dto\Response;
 
+use App\CoreAssistant\Core\Collection\Collection;
 use App\CoreAssistant\Domain\Message\Message;
 use App\CoreAssistant\Dto\MessageProcessor\LoggerSql\LoggerSql;
 use App\CoreAssistant\Dto\MessageProcessor\LoggerStep\LoggerSteps;
@@ -16,6 +17,7 @@ class ResponseDto
     private ?LoggerSql $loggerSql = null;
     private array $table = [];
     private ?Message $message;
+    private Collection $conversationMessages;
 
     public function getUserMessage(): string
     {
@@ -109,6 +111,18 @@ class ResponseDto
     public function setLoggerSql(?LoggerSql $loggerSql): self
     {
         $this->loggerSql = $loggerSql;
+
+        return $this;
+    }
+
+    public function getConversationMessages(): Collection
+    {
+        return $this->conversationMessages;
+    }
+
+    public function setConversationMessages(Collection $conversationMessages): self
+    {
+        $this->conversationMessages = $conversationMessages;
 
         return $this;
     }

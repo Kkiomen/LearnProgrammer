@@ -45,7 +45,7 @@ class ConversationService
 
     public function getConversationMessages(?string $sessionHash): Collection
     {
-        $conversation = $this->conversationRepository->findBy(['session_hash' => $sessionHash]);
+        $conversation = $this->conversationRepository->findAllMessages($sessionHash);
 
         if($conversation){
             return $conversation;

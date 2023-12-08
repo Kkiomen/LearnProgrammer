@@ -3,7 +3,10 @@
 namespace App\CoreAssistant\Adapter\Entity\Conversation;
 
 use App\Class\Assistant\Enum\AssistantType;
+use App\CoreAssistant\Adapter\Entity\Message\MessageEloquentRepository;
 use App\CoreAssistant\Adapter\Repository\EloquentRepository\EloquentRepository;
+use App\CoreAssistant\Adapter\Repository\EloquentRepository\Exceptions\NullModelForEloquentRepository;
+use App\CoreAssistant\Core\Collection\Collection;
 use App\CoreAssistant\Core\Domain\Abstract\Entity;
 use App\CoreAssistant\Domain\Conversation\ConversationBuilder;
 use App\CoreAssistant\Enum\ConversationStatus;
@@ -14,6 +17,14 @@ use Illuminate\Database\Eloquent\Model;
 class ConversationEloquentRepository extends EloquentRepository implements ConversationRepository
 {
     protected ?string $model = Conversation::class;
+
+    /**
+     * @param string|null $model
+     */
+    public function __construct(
+        private readonly MessageEloquentRepository $messageEloquentRepository
+    ){}
+
 
     function mapModelToEntity(Model $model): Entity
     {
@@ -55,5 +66,24 @@ class ConversationEloquentRepository extends EloquentRepository implements Conve
         $conversation->created_at = $updateAt;
 
         return $conversation;
+    }
+
+    public function findAllMessages(string $sessionHash): ?Collection
+    {
+        if($this->model === null){
+            throw new NullModelForEloquentRepository();
+        }
+
+        $criteria = ['session_hash' => $sessionHash];
+
+        $key = key($criteria);
+        $value = $criteria[$key];
+
+        $model = new $this->model();
+        $modelsFromEloquent = $model::where($key, $value)->first();
+
+        $messages = $modelsFromEloquent->messages()->orderBy('created_at')->get();
+
+        return $this->messageEloquentRepository->convertToCollection($messages);
     }
 }

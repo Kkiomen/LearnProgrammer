@@ -13,7 +13,7 @@ class MessageEloquentRepository extends EloquentRepository implements MessageRep
 {
     protected ?string $model = Message::class;
 
-    function mapModelToEntity(Model $model): Entity
+    public function mapModelToEntity(Model $model): Entity
     {
         $messageBuilder = new MessageBuilder();
         $messageBuilder
@@ -36,7 +36,7 @@ class MessageEloquentRepository extends EloquentRepository implements MessageRep
         return $messageBuilder->build();
     }
 
-    function mapEntityToModel(Entity $entity): Model
+    public function mapEntityToModel(Entity $entity): Model
     {
         if($entity->getId() !== null){
             $message = $this->getOrCreateModel($entity->getId());

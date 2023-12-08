@@ -4,6 +4,9 @@ namespace App\CoreAssistant\Helper;
 
 
 use App\CoreAssistant\Adapter\Entity\Message\MessageRepository;
+use App\CoreAssistant\Adapter\LLM\LanguageModel;
+use App\CoreAssistant\Adapter\LLM\LanguageModelSettings;
+use App\CoreAssistant\Adapter\LLM\LanguageModelType;
 use App\CoreAssistant\Api\OpenAiApi;
 use App\CoreAssistant\Dto\MessageProcessor\MessageProcessor;
 use App\CoreAssistant\Dto\Response\ResponseDto;
@@ -16,7 +19,8 @@ final class ResponseHelper
 {
     public function __construct(
         private OpenAiApi $openAiApi,
-        private MessageRepository $messageRepository
+        private MessageRepository $messageRepository,
+        private LanguageModel $languageModel
     ) {
     }
 
@@ -41,6 +45,7 @@ final class ResponseHelper
         $response->setLoggerStep($messageProcessor->getLoggerStep());
         $response->setLoggerSql($messageProcessor->getLoggerSql());
         $response->setTable($eventResult->getResultResponseTable());
+        $response->setConversationMessages($messageProcessor->getConversationMessages());
 
         return $response;
     }
@@ -78,15 +83,24 @@ final class ResponseHelper
         $loggerSql = $response->getLoggerSql();
         $table = $response->getTable();
         $messageModel = $response->getMessage();
+        $conversation = $response->getConversationMessages();
 
-        return response()->stream(function () use ($prompt, $systemPrompt, $temperature, $loggerStep, $loggerSql, $table, $messageModel) {
+        return response()->stream(function () use ($prompt, $systemPrompt, $temperature, $loggerStep, $loggerSql, $table, $messageModel, $conversation) {
             header('Content-Type: text/event-stream');
             header('Cache-Control: no-cache');
             header('Connection: keep-alive');
 
-            $stream = $this->openAiApi->chat($prompt, OpenAiModel::CHAT_GPT_3, $systemPrompt, [
-                'temperature' => $temperature
-            ]);
+//            $stream = $this->openAiApi->chat($prompt, OpenAiModel::CHAT_GPT_3, $systemPrompt, [
+//                'temperature' => $temperature
+//            ]);
+
+            $stream = $this->languageModel->generateStreamWithConversation(
+                prompt: $prompt,
+                systemPrompt: $systemPrompt,
+                settings: (new LanguageModelSettings())->setLanguageModelType(LanguageModelType::NORMAL)->setTemperature(0.7),
+                collectionOfMessages: $conversation
+            );
+
             $result = '';
             foreach ($stream as $response) {
                 $message = $response->choices[0]->toArray();

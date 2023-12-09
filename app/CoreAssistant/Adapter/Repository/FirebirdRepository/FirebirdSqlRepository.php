@@ -9,6 +9,9 @@ class FirebirdSqlRepository implements RepositorySqlInterface
 {
     public function select(string $selectSQL): array
     {
-        return DB::connection('firebird')->select($selectSQL);
+        $results = DB::connection('firebird')->select($selectSQL);
+
+        // Must convert to array because the result is stdClass
+        return json_decode(json_encode($results), true);
     }
 }

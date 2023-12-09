@@ -8,7 +8,7 @@ use App\CoreAssistant\Adapter\LLM\LanguageModelSettings;
 use App\CoreAssistant\Adapter\LLM\LanguageModelType;
 use App\CoreAssistant\Adapter\Repository\Interface\RepositorySqlInterface;
 use App\CoreAssistant\Dto\MessageProcessor\MessageProcessor;
-use App\CoreAssistant\Prompts\OrderSQLPrompt;
+use App\CoreAssistant\Prompts\DefaultSQLPrompt;
 use App\CoreAssistant\Prompts\ResponseUserPrompt;
 use App\CoreAssistant\Service\Event\EventResult;
 
@@ -26,7 +26,7 @@ class NormalSQLEvent extends Event
     {
         $messageProcessor->getLoggerStep()->addStep([
             'prompt' => $messageProcessor->getMessageFromUser(),
-            'systemPrompt' => OrderSQLPrompt::getPrompt(),
+            'systemPrompt' => DefaultSQLPrompt::getPrompt(),
         ], 'OrderEvent - Przygotowanie zapytania SQL');
 
         $attempt = 0;
@@ -36,13 +36,14 @@ class NormalSQLEvent extends Event
                 // Create SQL
                 $sql = $this->languageModel->generate(
                     prompt: $messageProcessor->getMessageFromUser(),
-                    systemPrompt: OrderSQLPrompt::getPrompt(),
+                    systemPrompt: DefaultSQLPrompt::getPrompt($this->tableListToPrompt),
                     settings: (new LanguageModelSettings())->setLanguageModelType(LanguageModelType::INTELLIGENT)->setTemperature(0.5)
                 );
+                dump($sql);
 
                 $messageProcessor->getLoggerStep()->addStep([
                     'prompt' => $messageProcessor->getMessageFromUser(),
-                    'systemPrompt' => OrderSQLPrompt::getPrompt(),
+                    'systemPrompt' => DefaultSQLPrompt::getPrompt(),
                     'sql' => $sql,
                 ], 'OrderEvent - Wygenerowany SQL');
 

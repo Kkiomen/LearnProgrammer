@@ -6,7 +6,7 @@ use App\Api\OpenAiApi;
 use App\Core\Class\Request\Factory\RequestDTOFactory;
 use App\Core\Helper\ResponseHelper;
 use App\CoreAssistant\Dto\MessageProcessor\LoggerStep\LoggerSteps;
-use App\CoreAssistant\Prompts\OrderSQLPrompt;
+use App\CoreAssistant\Prompts\DefaultSQLPrompt;
 use App\CoreAssistant\Prompts\ResponseUserPrompt;
 use App\CoreAssistant\Service\Interfaces\MessageFacadeInterface;
 use App\CoreAssistant\Service\Message\MessageFacade;

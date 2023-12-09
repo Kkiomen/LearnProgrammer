@@ -7,10 +7,11 @@ use App\CoreAssistant\Adapter\LLM\LanguageModel;
 use App\CoreAssistant\Adapter\LLM\LanguageModelSettings;
 use App\CoreAssistant\Adapter\LLM\LanguageModelType;
 use App\CoreAssistant\Adapter\Repository\Interface\RepositorySqlInterface;
+use App\CoreAssistant\Config\TableToPrompts\TablePrompt;
 use App\CoreAssistant\Core\Exceptions\FailedGenerateDataException;
 use App\CoreAssistant\Dto\MessageProcessor\MessageProcessor;
 use App\CoreAssistant\Prompts\CreateHeaderTablePrompt;
-use App\CoreAssistant\Prompts\OrderSQLPrompt;
+use App\CoreAssistant\Prompts\DefaultSQLPrompt;
 use App\CoreAssistant\Service\Event\EventResult;
 
 class ListOrderEvent extends Event
@@ -21,6 +22,12 @@ class ListOrderEvent extends Event
     protected ?string $description = 'Wyświetlenie zamówień / produktów / klientów w formie tabeli. Np. wyświetl ostatnie zamówienia albo wyświetl coś w formie tabeli';
     protected array $triggers = ['wyświetl', 'lista', 'listy', 'wymień', 'listy', 'tabela', 'tabeli'];
 
+    protected array $tableListToPrompt = [
+        TablePrompt::CLIENTS,
+        TablePrompt::PRODUCTS,
+        TablePrompt::INVOICES,
+        TablePrompt::INVOICE_POSITIONS
+    ];
 
     public function __construct(
         private readonly LanguageModel $languageModel,
@@ -32,13 +39,13 @@ class ListOrderEvent extends Event
     {
         $messageProcessor->getLoggerStep()->addStep([
             'prompt' => $messageProcessor->getMessageFromUser(),
-            'systemPrompt' => OrderSQLPrompt::getPrompt()
+            'systemPrompt' => DefaultSQLPrompt::getPrompt()
         ], 'ListOrderEvent - Przygotowanie zapytania SQL');
 
 
         try{
 
-            $dataTable = $this->generateDataForTable($messageProcessor->getMessageFromUser(), OrderSQLPrompt::getPrompt(), $messageProcessor);
+            $dataTable = $this->generateDataForTable($messageProcessor->getMessageFromUser(), DefaultSQLPrompt::getPrompt(), $messageProcessor);
             $firstRowTable = json_encode($dataTable['result'][0]);
             $headerTable = $this->generateHeader($firstRowTable, CreateHeaderTablePrompt::getPrompt($dataTable['sql']), $messageProcessor);
 
@@ -92,7 +99,7 @@ class ListOrderEvent extends Event
 
                 $messageProcessor->getLoggerStep()->addStep([
                     'prompt' => $messageProcessor->getMessageFromUser(),
-                    'systemPrompt' => OrderSQLPrompt::getPrompt(),
+                    'systemPrompt' => DefaultSQLPrompt::getPrompt(),
                     'sql' => $sql,
                 ], 'ListOrderEvent - Wygenerowany SQL');
 

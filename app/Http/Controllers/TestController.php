@@ -12,12 +12,14 @@ use App\CoreAssistant\Adapter\Entity\Message\MessageEloquentRepository;
 use App\CoreAssistant\Adapter\Entity\Message\MessageRepository;
 use App\CoreAssistant\Adapter\LLM\LanguageModel;
 use App\CoreAssistant\Api\OpenAiApi;
+use App\CoreAssistant\Config\TableToPrompts\TablePrompt;
 use App\CoreAssistant\DeclarationClass\Events\ListOrderEvent;
 use App\CoreAssistant\Domain\Conversation\Conversation;
 use App\CoreAssistant\Domain\Message\Message;
 use App\CoreAssistant\Dto\MessageProcessor\MessageProcessor;
 use App\CoreAssistant\Enum\OpenAiModel;
 use App\CoreAssistant\Prompts\CreateHeaderTablePrompt;
+use App\CoreAssistant\Prompts\DefaultSQLPrompt;
 use App\CoreAssistant\Service\Interfaces\MessageFacadeInterface;
 use App\CoreAssistant\Service\Message\ConversationService;
 use App\CoreAssistant\Service\Message\MessageFacade;
@@ -60,20 +62,30 @@ class TestController
 
     public function test(Request $request)
     {
-
-        dd(DB::connection('firebird')->select('SELECT * FROM CLIENTS'));
+        $tables = [
+            TablePrompt::CLIENTS,
+            TablePrompt::PRODUCTS,
+            TablePrompt::INVOICES,
+            TablePrompt::INVOICE_POSITIONS
+        ];
+        echo DefaultSQLPrompt::getPrompt($tables);
+        dd(DefaultSQLPrompt::getPrompt($tables));
+//
+//        $results = DB::connection('firebird')->select('SELECT * FROM CLIENTS');
+//        $resultsArray = json_decode(json_encode($results), true);
+//        dd($resultsArray);
 
 
 //        dd($this->repository->findAllMessages('d1ce2a50-24a3-44f4-9b30-0aec2878600f'));
 //
 //
 //
-//        $messageProcessor = new MessageProcessor();
-//        $messageProcessor->setMessageFromUser('Jakie id ma produkt Talerz obiadowy głęboki 23 cm biały kwadrat?');
-//        $messageProcessor->setSessionHash('d1ce2a50-24a3-44f4-9b30-0aec2878600f');
-//
-//        $this->messageFacade->loadMessageProcessor($messageProcessor);
-//        $this->messageFacade->processAndReturnResponse();
+        $messageProcessor = new MessageProcessor();
+        $messageProcessor->setMessageFromUser('Jaki jest najczęściej kupowany produkt?');
+        $messageProcessor->setSessionHash('d1ce2a50-24a3-44f4-9b30-0aec2878600f');
+
+        $this->messageFacade->loadMessageProcessor($messageProcessor);
+        $this->messageFacade->processAndReturnResponse();
 //
 //        $messageProcessor = new MessageProcessor();
 //        $messageProcessor->setMessageFromUser('Jaki klient dokonał najwięcej zamówień?');

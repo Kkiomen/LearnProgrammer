@@ -8,7 +8,7 @@ use App\CoreAssistant\Adapter\Entity\Message\MessageEloquentRepository;
 use App\CoreAssistant\Adapter\Entity\Message\MessageRepository;
 use App\CoreAssistant\Adapter\LLM\LanguageModel;
 use App\CoreAssistant\Adapter\LLM\models\OpenAi\OpenAiLanguageModel;
-use App\CoreAssistant\Adapter\Repository\EloquentRepository\EloquentSqlRepository;
+use App\CoreAssistant\Adapter\Repository\FirebirdRepository\FirebirdSqlRepository;
 use App\CoreAssistant\Adapter\Repository\Interface\RepositorySqlInterface;
 use Illuminate\Support\ServiceProvider;
 
@@ -22,7 +22,7 @@ class AppServiceProvider extends ServiceProvider
     public function register()
     {
         // Repository
-        $this->app->bind(RepositorySqlInterface::class, EloquentSqlRepository::class);
+        $this->app->bind(RepositorySqlInterface::class, FirebirdSqlRepository::class);
         $this->app->bind(MessageRepository::class, MessageEloquentRepository::class);
         $this->app->bind(ConversationRepository::class, ConversationEloquentRepository::class);
 

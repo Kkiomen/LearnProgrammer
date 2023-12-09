@@ -2,7 +2,6 @@
 
 namespace App\CoreAssistant\Abstract;
 
-use App\Core\Dto\EventData;
 use App\CoreAssistant\Dto\MessageProcessor\MessageProcessor;
 use App\CoreAssistant\Service\Event\EventResult;
 
@@ -25,6 +24,12 @@ abstract class Event
      * @example ['calendar', 'event']
      */
     protected array $triggers = [];
+
+    /**
+     * @var array $tableListToPrompt List of table to used in prompt
+     * @example ['TablePrompt::CLIENTS', 'TablePrompt::PRODUCTS']
+     */
+    protected array $tableListToPrompt = [];
 
     /**
      * @return string|null The name of the event

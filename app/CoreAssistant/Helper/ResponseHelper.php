@@ -90,10 +90,6 @@ final class ResponseHelper
             header('Cache-Control: no-cache');
             header('Connection: keep-alive');
 
-//            $stream = $this->openAiApi->chat($prompt, OpenAiModel::CHAT_GPT_3, $systemPrompt, [
-//                'temperature' => $temperature
-//            ]);
-
             $stream = $this->languageModel->generateStreamWithConversation(
                 prompt: $prompt,
                 systemPrompt: $systemPrompt,

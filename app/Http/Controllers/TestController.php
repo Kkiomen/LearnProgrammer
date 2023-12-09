@@ -60,34 +60,38 @@ class TestController
 
     public function test(Request $request)
     {
-        dd($this->repository->findAllMessages('d1ce2a50-24a3-44f4-9b30-0aec2878600f'));
+
+        dd(DB::connection('firebird')->select('SELECT * FROM CLIENTS'));
 
 
-
-        $messageProcessor = new MessageProcessor();
-        $messageProcessor->setMessageFromUser('Jakie id ma produkt Talerz obiadowy głęboki 23 cm biały kwadrat?');
-        $messageProcessor->setSessionHash('d1ce2a50-24a3-44f4-9b30-0aec2878600f');
-
-        $this->messageFacade->loadMessageProcessor($messageProcessor);
-        $this->messageFacade->processAndReturnResponse();
-
-        $messageProcessor = new MessageProcessor();
-        $messageProcessor->setMessageFromUser('Jaki klient dokonał najwięcej zamówień?');
-        $messageProcessor->setSessionHash('d1ce2a50-24a3-44f4-9b30-0aec2878600f');
-
-        $this->messageFacade->loadMessageProcessor($messageProcessor);
-        $this->messageFacade->processAndReturnResponse();
-
-
-//        $message = $this->conversationService->createMessage($messageProcessor);
-        dd('done');
-
-        $conversation = new Conversation();
-        $conversation->setSessionHash('d1ce2a50-24a3-44f4-9b30-0aec2878600f');
-
-        $d = $this->repository->save($conversation);
-
-        dump($d);
+//        dd($this->repository->findAllMessages('d1ce2a50-24a3-44f4-9b30-0aec2878600f'));
+//
+//
+//
+//        $messageProcessor = new MessageProcessor();
+//        $messageProcessor->setMessageFromUser('Jakie id ma produkt Talerz obiadowy głęboki 23 cm biały kwadrat?');
+//        $messageProcessor->setSessionHash('d1ce2a50-24a3-44f4-9b30-0aec2878600f');
+//
+//        $this->messageFacade->loadMessageProcessor($messageProcessor);
+//        $this->messageFacade->processAndReturnResponse();
+//
+//        $messageProcessor = new MessageProcessor();
+//        $messageProcessor->setMessageFromUser('Jaki klient dokonał najwięcej zamówień?');
+//        $messageProcessor->setSessionHash('d1ce2a50-24a3-44f4-9b30-0aec2878600f');
+//
+//        $this->messageFacade->loadMessageProcessor($messageProcessor);
+//        $this->messageFacade->processAndReturnResponse();
+//
+//
+////        $message = $this->conversationService->createMessage($messageProcessor);
+//        dd('done');
+//
+//        $conversation = new Conversation();
+//        $conversation->setSessionHash('d1ce2a50-24a3-44f4-9b30-0aec2878600f');
+//
+//        $d = $this->repository->save($conversation);
+//
+//        dump($d);
 
 //        $messageProcessor = new MessageProcessor();
 //        $messageProcessor->setMessageFromUser('Podaj w formie tabeli imię oraz nazwisko klientów którzy złożyli 3 ostatnie zamówienia');

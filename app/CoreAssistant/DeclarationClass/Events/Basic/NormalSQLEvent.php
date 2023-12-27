@@ -8,6 +8,7 @@ use App\CoreAssistant\Adapter\LLM\LanguageModelSettings;
 use App\CoreAssistant\Adapter\LLM\LanguageModelType;
 use App\CoreAssistant\Adapter\Repository\Interface\RepositorySqlInterface;
 use App\CoreAssistant\Dto\MessageProcessor\MessageProcessor;
+use App\CoreAssistant\Helper\SqlHelper;
 use App\CoreAssistant\Prompts\DefaultSQLPrompt;
 use App\CoreAssistant\Prompts\ResponseUserPrompt;
 use App\CoreAssistant\Service\Event\EventResult;
@@ -39,7 +40,8 @@ class NormalSQLEvent extends Event
                     systemPrompt: DefaultSQLPrompt::getPrompt($this->tableListToPrompt),
                     settings: (new LanguageModelSettings())->setLanguageModelType(LanguageModelType::INTELLIGENT)->setTemperature(0.5)
                 );
-                dump($sql);
+
+                $sql = SqlHelper::extractSqlQuery($sql) ?? $sql;
 
                 $messageProcessor->getLoggerStep()->addStep([
                     'prompt' => $messageProcessor->getMessageFromUser(),

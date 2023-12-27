@@ -42,7 +42,8 @@ class DefaultSQLPrompt extends Prompt
             Czyli naprzykład zamiast podawać identyfikator klienta podaj jego nazwe
 
             ## Dzisiaj jest: ". now() ."
-            # Zwróć zapytanie SQL i tylko zapytanie SQL
+            ### W szczególności do wybrania ograniczonej liczby wierszy wynikowych nie używaj konstrukcji \"LIMIT\" tylko \"SELECT FIRST\". Wszędzie gdzie w zapytaniu pobierasz ID, pobieraj także nazwy, opisy, itp.
+            ###  Zwróć zapytanie SQL i tylko zapytanie SQL. Użyj standardu języka SQL dla bazy Firebird.
         ";
     }
 
